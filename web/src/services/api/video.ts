@@ -193,12 +193,18 @@ async function createAgnesVideoTask(config: AiConfig, model: string, prompt: str
 
 async function pollAgnesVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
     try {
+        // Agnes 官方推荐轮询端点；task.model 即 model_name（keyframe/reference 模式必填）
         const url = `${aiApiUrl(config, "/agnesapi")}?video_id=${encodeURIComponent(task.id)}&model_name=${encodeURIComponent(task.model)}`;
-        const video = unwrapVideoResponse((await axios.get<ApiVideoResponse>(url, { headers: aiHeaders(config), signal: options?.signal })).data);
+        const response = await axios.get<ApiVideoResponse>(url, { headers: aiHeaders(config), signal: options?.signal, validateStatus: (code) => code === 200 || code === 404 });
+        const raw = response.data;
+        // 任务尚未被轮询服务识别时返回 404，视为 pending，不中断轮询循环
+        if (response.status === 404 || (typeof raw === "object" && raw && "error" in raw && (raw as { error?: { code?: number } }).error?.code === 404)) {
+            return { status: "pending" };
+        }
+        const video = unwrapVideoResponse(raw);
         const resultUrl = videoResultUrl(video);
         if (resultUrl) return { status: "completed", result: await videoResultFromUrl(resultUrl, options) };
         if (video.status === "completed") {
-            // 兜底：部分响应在 content.video_url
             const contentUrl = video.content?.video_url || video.content?.url;
             if (typeof contentUrl === "string" && contentUrl) return { status: "completed", result: await videoResultFromUrl(contentUrl, options) };
             return { status: "pending" };
