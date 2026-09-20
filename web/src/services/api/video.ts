@@ -390,9 +390,17 @@ async function buildAgnesVideoBody(
     if (mode === "frames") {
         // keyframe：first_frame / last_frame 至少一个，取前两张参考图
         const urls = await Promise.all(references.slice(0, 2).map((image) => resolveAgnesMediaRef(image)));
-        body.mode = "keyframe";
-        if (urls[0]) body.first_frame = urls[0];
-        if (urls[1]) body.last_frame = urls[1];
+        if (urls.length === 1 || (urls[0] && !urls[1])) {
+            // 只有一张参考图（首帧）时降级为 reference 模式，
+            // keyframe 模式要求 first_frame + last_frame 齐备，缺失尾帧时 Agnes 素材校验会报「素材 URL 无法下载」
+            body.mode = "reference";
+            const images = urls.filter(Boolean);
+            if (images.length) body.images = images.slice(0, 5);
+        } else {
+            body.mode = "keyframe";
+            if (urls[0]) body.first_frame = urls[0];
+            if (urls[1]) body.last_frame = urls[1];
+        }
     } else if (mode === "reference") {
         // reference：images 最多 5 张，audios 最多 3 段；videos 不支持
         const images = (await Promise.all(references.map((image) => resolveAgnesMediaRef(image)))).filter(Boolean);
@@ -401,6 +409,16 @@ async function buildAgnesVideoBody(
             : [];
         if (images.length) body.images = images.slice(0, 5);
         if (audios.length) body.audios = audios;
+    }
+    // 两种模式都至少要有一个素材引用，否则 Agnes 报「素材 URL 无法下载」
+    const hasAnyRef = "first_frame" in body || "last_frame" in body || (body.images as unknown[] | undefined)?.length || (body.audios as unknown[] | undefined)?.length;
+    if (!hasAnyRef) {
+        // 所有素材都解析失败（本地 blob 读取失败等）→ 降级为纯 text 模式，避免报错
+        delete (body as Record<string, unknown>).first_frame;
+        delete (body as Record<string, unknown>).last_frame;
+        delete (body as Record<string, unknown>).images;
+        delete (body as Record<string, unknown>).audios;
+        body.mode = "text";
     }
     return body;
 }
