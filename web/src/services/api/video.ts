@@ -192,16 +192,45 @@ async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: st
     }
 }
 
+async function readAgnesServerMessage(error: unknown): Promise<string | null> {
+    try {
+        if (axios.isAxiosError(error) && error.response && typeof error.response.data === "object") {
+            const data = error.response.data as { code?: string; message?: string };
+            if (data.message) return data.message;
+        }
+    } catch {
+        // 非标准响应忽略
+    }
+    return null;
+}
+
+/** 创建 Agnes 视频任务；服务端队列满（video_queue_full）时自动排队重试。
+ *  免费额度同一时间只能有 1 个视频在生成，重试间隔 20s，最多 10 次（约 3.3 分钟）。 */
 async function createAgnesVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
     const body = await buildAgnesVideoBody(config, model, prompt, references, options);
-    try {
-        const created = unwrapVideoResponse((await axios.post<ApiVideoResponse>(aiApiUrl(config, "/videos"), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data);
-        const id = created.video_id || created.id;
-        if (!id) throw new Error(apiText("noVideoTaskId"));
-        return { id, provider: "openai", model };
-    } catch (error) {
-        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    const maxAttempts = 10;
+    let lastMessage = "";
+    for (let attempt = 0; attempt <= maxAttempts; attempt += 1) {
+        if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
+        try {
+            const created = unwrapVideoResponse((await axios.post<ApiVideoResponse>(aiApiUrl(config, "/videos"), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data);
+            const id = created.video_id || created.id;
+            if (!id) throw new Error(apiText("noVideoTaskId"));
+            return { id, provider: "openai", model };
+        } catch (error) {
+            if (options?.signal?.aborted) throw error;
+            if (attempt === maxAttempts) break;
+            const serverMessage = await readAgnesServerMessage(error);
+            // 服务端队列已满：等待 20s 后重试（串行锁保证本机最多 1 个任务在途，无需额外退避）
+            if (serverMessage?.includes("队列已满") || serverMessage?.includes("video_queue_full")) {
+                lastMessage = serverMessage;
+                await delay(20_000, options?.signal);
+                continue;
+            }
+            throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+        }
     }
+    throw new Error(lastMessage || apiText("videoTaskCreateFailed"));
 }
 
 async function pollAgnesVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
