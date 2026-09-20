@@ -324,16 +324,29 @@ function isAgnesVideoModel(model: string) {
     return String(model || "").toLowerCase().includes("agnes-video");
 }
 
-/** 将本地参考素材解析为 Agnes 可公开访问的 URL；无法提供时返回空字符串。 */
-async function resolvePublicMediaUrl(item: { storageKey?: string; url?: string }): Promise<string> {
+/** 将本地参考素材解析为 Agnes 可接受的素材引用：公网 URL 直接透传，本地素材读成 Data URI Base64。 */
+async function resolveAgnesMediaRef(item: { storageKey?: string; url?: string }): Promise<string> {
     const resolved = item.storageKey ? await resolveMediaUrl(item.storageKey, item.url || "") : item.url || "";
     try {
         const parsed = new URL(resolved, window.location.origin);
         if (parsed.protocol === "http:" || parsed.protocol === "https:") return parsed.href;
     } catch {
-        // 非标准 URL（如 blob:）无法被 Agnes 访问
+        // 非标准 URL（blob:/相对路径）继续走下方 Data URI 转换
     }
-    return "";
+    if (!resolved || !item.storageKey) return "";
+    try {
+        const blob = await getMediaBlob(item.storageKey);
+        if (!blob || !blob.size) return "";
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+        });
+        return dataUrl;
+    } catch {
+        return "";
+    }
 }
 
 /** 构建 Agnes 视频创建任务请求体（严格字段白名单：text/keyframe/reference 三种模式）。 */
@@ -357,15 +370,15 @@ async function buildAgnesVideoBody(
     };
     if (mode === "frames") {
         // keyframe：first_frame / last_frame 至少一个，取前两张参考图
-        const urls = await Promise.all(references.slice(0, 2).map((image) => resolvePublicMediaUrl(image)));
+        const urls = await Promise.all(references.slice(0, 2).map((image) => resolveAgnesMediaRef(image)));
         body.mode = "keyframe";
         if (urls[0]) body.first_frame = urls[0];
         if (urls[1]) body.last_frame = urls[1];
     } else if (mode === "reference") {
         // reference：images 最多 5 张，audios 最多 3 段；videos 不支持
-        const images = (await Promise.all(references.map((image) => resolvePublicMediaUrl(image)))).filter(Boolean);
+        const images = (await Promise.all(references.map((image) => resolveAgnesMediaRef(image)))).filter(Boolean);
         const audios = options?.audios
-            ? (await Promise.all(options.audios.slice(0, 3).map((audio) => resolvePublicMediaUrl(audio)))).filter(Boolean)
+            ? (await Promise.all(options.audios.slice(0, 3).map((audio) => resolveAgnesMediaRef(audio)))).filter(Boolean)
             : [];
         if (images.length) body.images = images.slice(0, 5);
         if (audios.length) body.audios = audios;
