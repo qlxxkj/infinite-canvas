@@ -242,6 +242,22 @@ function supportsGeminiImageSize(model: string) {
     return value.includes("gemini-3") || value.includes("3.1") || value.includes("3-pro");
 }
 
+/** Agnes 图像模型（文生图/图生图走 /images/generations 的严格字段白名单）。 */
+function isAgnesImageModel(model: string) {
+    return String(model || "").toLowerCase().includes("agnes-image");
+}
+
+/** Agnes 文生图请求体：只保留白名单字段，size 档位 + ratio，n 固定 1。 */
+function resolveAgnesImageSize(quality: string | undefined, size: string): { size?: string; ratio?: string } {
+    const parsedRatio = parseImageRatio(size);
+    const scale = quality === "high" || quality === "4k" ? "4K" : quality === "medium" || quality === "hd" || quality === "2k" ? "2K" : "1K";
+    const out: { size?: string; ratio?: string } = { size: scale };
+    if (parsedRatio && `${parsedRatio.width}:${parsedRatio.height}` !== "1:1") {
+        out.ratio = `${parsedRatio.width}:${parsedRatio.height}`;
+    }
+    return out;
+}
+
 function resolveImageSource(item: Record<string, unknown>) {
     if (typeof item.b64_json === "string" && item.b64_json) {
         return `data:image/png;base64,${item.b64_json}`;
@@ -757,6 +773,28 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
     const requestSize = resolveRequestSize(quality, config.size);
     const background = normalizeBackground(config.background);
     try {
+        if (isAgnesImageModel(requestConfig.model)) {
+            // Agnes 文生图队列对请求体做字段白名单校验：只接受 model/prompt/size/ratio/n(=1)/response_format，
+            // 不接受 output_format/quality/background；size 必须是 1K/2K/3K/4K 档位，比例走 ratio。
+            const agnesSize = resolveAgnesImageSize(quality, config.size);
+            const response = await axios.post<ImageApiResponse>(
+                aiApiUrl(requestConfig, "/images/generations"),
+                {
+                    model: requestConfig.model,
+                    prompt: withSystemPrompt(requestConfig, prompt),
+                    n: 1,
+                    ...agnesSize,
+                    response_format: "b64_json",
+                },
+                {
+                    headers: aiHeaders(requestConfig, "application/json"),
+                    signal: options?.signal,
+                    timeout: IMAGE_REQUEST_TIMEOUT_MS,
+                },
+            );
+            const images = await parseImagePayload(response.data);
+            return images;
+        }
         const response = await axios.post<ImageApiResponse>(
             aiApiUrl(requestConfig, "/images/generations"),
             {
@@ -814,6 +852,29 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
         } catch (error) {
             throw new Error(readAxiosError(error, apiText("requestFailed")));
         }
+    }
+    if (isAgnesImageModel(requestConfig.model)) {
+        // Agnes 图生图：无 /images/edits 端点，参考图以 Data URL 放入 /images/generations 的 extra_body.image。
+        const imageUrls = await Promise.all(references.map((image) => imageToDataUrl(image)));
+        const agnesSize = resolveAgnesImageSize(normalizeQuality(config.quality), config.size);
+        const response = await axios.post<ImageApiResponse>(
+            aiApiUrl(requestConfig, "/images/generations"),
+            {
+                model: requestConfig.model,
+                prompt: withSystemPrompt(requestConfig, requestPrompt),
+                n: 1,
+                ...agnesSize,
+                response_format: "b64_json",
+                extra_body: { image: imageUrls },
+            },
+            {
+                headers: aiHeaders(requestConfig, "application/json"),
+                signal: options?.signal,
+                timeout: IMAGE_REQUEST_TIMEOUT_MS,
+            },
+        );
+        const images = await parseImagePayload(response.data);
+        return images;
     }
 
     const quality = normalizeQuality(config.quality);
