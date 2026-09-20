@@ -199,6 +199,16 @@ function resolveRequestSize(quality: string | undefined, size: string) {
         validateImageSize(dimensions.width, dimensions.height);
         return `${dimensions.width}x${dimensions.height}`;
     }
+    // "WxH" 写法的比例（非像素）：按 1:1 兜底解析，交给 resolveSize 走档位映射
+    if (/^[0-9]+x[0-9]+$/.test(value)) {
+        const parts = value.toLowerCase().split("x");
+        const w = Number(parts[0]);
+        const h = Number(parts[1]);
+        if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) {
+            return resolveSize(quality, `${w}:${h}`);
+        }
+        return resolveSize(quality, "1:1");
+    }
     if (value.includes(":")) return resolveSize(quality, value);
     throw new Error(apiText("invalidImageSizeFormat"));
 }
@@ -855,7 +865,13 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
     }
     if (isAgnesImageModel(requestConfig.model)) {
         // Agnes 图生图：无 /images/edits 端点，参考图以 Data URL 放入 /images/generations 的 extra_body.image。
-        const imageUrls = await Promise.all(references.map((image) => imageToDataUrl(image)));
+        const imageRefs = await Promise.all(
+            references.map(async (image) => {
+                const publicUrl = String(image.url || "").trim();
+                if (publicUrl && /^https?:\/\//i.test(publicUrl)) return publicUrl;
+                return imageToDataUrl(image);
+            }),
+        );
         const agnesSize = resolveAgnesImageSize(normalizeQuality(config.quality), config.size);
         const response = await axios.post<ImageApiResponse>(
             aiApiUrl(requestConfig, "/images/generations"),
@@ -865,7 +881,7 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
                 n: 1,
                 ...agnesSize,
                 response_format: "b64_json",
-                extra_body: { image: imageUrls },
+                extra_body: { image: imageRefs },
             },
             {
                 headers: aiHeaders(requestConfig, "application/json"),
