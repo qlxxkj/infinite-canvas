@@ -43,8 +43,18 @@ function aiHeaders(config: AiConfig, contentType?: string) {
     };
 }
 
+/** 串行视频任务锁：Agnes 免费额度同一时间只能生成 1 个视频，
+ * 所有创建/轮询路径统一排队，避免并发触发 video_queue_full。 */
+let videoTaskChain: Promise<unknown> = Promise.resolve();
+
+function queueSerialVideoTask<T>(job: () => Promise<T>): Promise<T> {
+    const run = videoTaskChain.then(job, job);
+    videoTaskChain = run.catch(() => undefined);
+    return run;
+}
+
 export async function requestVideoGeneration(config: AiConfig, prompt: string, references: ReferenceImage[] = [], options?: VideoMediaOptions): Promise<VideoGenerationResult> {
-    return waitForVideoGenerationTask(config, await createVideoGenerationTask(config, prompt, references, options), options);
+    return queueSerialVideoTask(async () => waitForVideoGenerationTask(config, await createVideoGenerationTask(config, prompt, references, options), options));
 }
 
 export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationResult> {
@@ -70,6 +80,7 @@ function videoTaskFailed(message: string) {
 }
 
 export async function createVideoGenerationTask(config: AiConfig, prompt: string, references: ReferenceImage[] = [], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    // 任务创建同样排队，保证任意时刻最多 1 个 Agnes 视频任务在途
     const selectedModel = (config.model || config.videoModel).trim();
     const requestConfig = resolveModelRequestConfig(config, selectedModel);
     const script = resolveModelScript(config, selectedModel);
@@ -88,7 +99,9 @@ export async function pollVideoGenerationTask(config: AiConfig, task: VideoGener
     const requestConfig = resolveModelRequestConfig(config, task.model);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (task.provider === "gemini") return pollGeminiVideoTask(requestConfig, task, options);
-    if (task.provider === "openai" && isAgnesVideoModel(requestConfig.model)) return pollAgnesVideoTask(requestConfig, task, options);
+    if (task.provider === "openai" && isAgnesVideoModel(requestConfig.model)) {
+        return queueSerialVideoTask(() => pollAgnesVideoTask(requestConfig, task, options));
+    }
     return pollOpenAIVideoTask(requestConfig, task, options);
 }
 
