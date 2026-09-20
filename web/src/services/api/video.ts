@@ -11,7 +11,7 @@ import { runModelPlugin } from "./model-plugin";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 
-type VideoResponse = { id: string; status?: string; error?: { message?: string }; url?: string; result_url?: string; video_url?: string; content?: { video_url?: string; url?: string } | null };
+type VideoResponse = { id: string; video_id?: string; status?: string; error?: { message?: string }; url?: string; result_url?: string; video_url?: string; content?: { video_url?: string; url?: string } | null };
 type ApiVideoResponse = VideoResponse | { code?: number | string; data?: VideoResponse | null; msg?: string; message?: string; error?: { message?: string } };
 type ApiEnvelope<T> = T | { code?: number | string; data?: T | null; msg?: string; message?: string; error?: { message?: string } };
 type RequestOptions = { signal?: AbortSignal };
@@ -76,6 +76,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (script) return createPluginVideoTask(requestConfig, selectedModel, script, prompt, references, options);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (requestConfig.apiFormat === "gemini") return createGeminiVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (isAgnesVideoModel(requestConfig.model)) return createAgnesVideoTask(requestConfig, selectedModel, prompt, references, options);
     return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options);
 }
 
@@ -87,6 +88,7 @@ export async function pollVideoGenerationTask(config: AiConfig, task: VideoGener
     const requestConfig = resolveModelRequestConfig(config, task.model);
     assertVideoConfig(requestConfig, requestConfig.model);
     if (task.provider === "gemini") return pollGeminiVideoTask(requestConfig, task, options);
+    if (task.provider === "openai" && isAgnesVideoModel(requestConfig.model)) return pollAgnesVideoTask(requestConfig, task, options);
     return pollOpenAIVideoTask(requestConfig, task, options);
 }
 
@@ -174,6 +176,37 @@ async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: st
         return { id: created.id, provider: "openai", model };
     } catch (error) {
         throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function createAgnesVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const body = await buildAgnesVideoBody(config, model, prompt, references, options);
+    try {
+        const created = unwrapVideoResponse((await axios.post<ApiVideoResponse>(aiApiUrl(config, "/videos"), body, { headers: aiHeaders(config, "application/json"), signal: options?.signal })).data);
+        const id = created.video_id || created.id;
+        if (!id) throw new Error(apiText("noVideoTaskId"));
+        return { id, provider: "openai", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollAgnesVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const url = `${aiApiUrl(config, "/agnesapi")}?video_id=${encodeURIComponent(task.id)}&model_name=${encodeURIComponent(task.model)}`;
+        const video = unwrapVideoResponse((await axios.get<ApiVideoResponse>(url, { headers: aiHeaders(config), signal: options?.signal })).data);
+        const resultUrl = videoResultUrl(video);
+        if (resultUrl) return { status: "completed", result: await videoResultFromUrl(resultUrl, options) };
+        if (video.status === "completed") {
+            // 兜底：部分响应在 content.video_url
+            const contentUrl = video.content?.video_url || video.content?.url;
+            if (typeof contentUrl === "string" && contentUrl) return { status: "completed", result: await videoResultFromUrl(contentUrl, options) };
+            return { status: "pending" };
+        }
+        if (video.status === "failed" || video.status === "cancelled") return { status: "failed", error: readApiErrorMessage(video.error?.message) || apiText("videoGenerationFailed") };
+        return { status: "pending" };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
     }
 }
 
@@ -278,6 +311,60 @@ function geminiVideoHeaders(config: Pick<AiConfig, "apiKey">) {
 function videoAspectRatio(size: string) {
     const ratio = inferVideoRatio(size);
     return ratio === "auto" ? "16:9" : ratio;
+}
+
+/** Agnes 视频模型（agnes-video-2.x）：创建任务走 /videos JSON，轮询走 /agnesapi?video_id=... */
+function isAgnesVideoModel(model: string) {
+    return String(model || "").toLowerCase().includes("agnes-video");
+}
+
+/** 将本地参考素材解析为 Agnes 可公开访问的 URL；无法提供时返回空字符串。 */
+async function resolvePublicMediaUrl(item: { storageKey?: string; url?: string }): Promise<string> {
+    const resolved = item.storageKey ? await resolveMediaUrl(item.storageKey, item.url || "") : item.url || "";
+    try {
+        const parsed = new URL(resolved, window.location.origin);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") return parsed.href;
+    } catch {
+        // 非标准 URL（如 blob:）无法被 Agnes 访问
+    }
+    return "";
+}
+
+/** 构建 Agnes 视频创建任务请求体（严格字段白名单：text/keyframe/reference 三种模式）。 */
+async function buildAgnesVideoBody(
+    config: AiConfig,
+    model: string,
+    prompt: string,
+    references: ReferenceImage[],
+    options?: VideoMediaOptions,
+) {
+    const ratio = videoAspectRatio(config.size);
+    const mode = resolveVideoMode(config.videoMode, references.length);
+    const body: Record<string, unknown> = {
+        model: modelOptionName(model),
+        prompt,
+        mode,
+        seconds: normalizeVideoSeconds(config.videoSeconds),
+        size: "720P",
+        aspect_ratio: ratio,
+        n: 1,
+    };
+    if (mode === "frames") {
+        // keyframe：first_frame / last_frame 至少一个，取前两张参考图
+        const urls = await Promise.all(references.slice(0, 2).map((image) => resolvePublicMediaUrl(image)));
+        body.mode = "keyframe";
+        if (urls[0]) body.first_frame = urls[0];
+        if (urls[1]) body.last_frame = urls[1];
+    } else if (mode === "reference") {
+        // reference：images 最多 5 张，audios 最多 3 段；videos 不支持
+        const images = (await Promise.all(references.map((image) => resolvePublicMediaUrl(image)))).filter(Boolean);
+        const audios = options?.audios
+            ? (await Promise.all(options.audios.slice(0, 3).map((audio) => resolvePublicMediaUrl(audio)))).filter(Boolean)
+            : [];
+        if (images.length) body.images = images.slice(0, 5);
+        if (audios.length) body.audios = audios;
+    }
+    return body;
 }
 
 function parseDataUrlInline(dataUrl: string, fallbackType = "image/png"): GeminiInlineData {
