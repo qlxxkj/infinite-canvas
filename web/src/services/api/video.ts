@@ -324,29 +324,48 @@ function isAgnesVideoModel(model: string) {
     return String(model || "").toLowerCase().includes("agnes-video");
 }
 
-/** 将本地参考素材解析为 Agnes 可接受的素材引用：公网 URL 直接透传，本地素材读成 Data URI Base64。 */
-async function resolveAgnesMediaRef(item: { storageKey?: string; url?: string }): Promise<string> {
-    const resolved = item.storageKey ? await resolveMediaUrl(item.storageKey, item.url || "") : item.url || "";
-    try {
-        const parsed = new URL(resolved, window.location.origin);
-        if (parsed.protocol === "http:" || parsed.protocol === "https:") return parsed.href;
-    } catch {
-        // 非标准 URL（blob:/相对路径）继续走下方 Data URI 转换
-    }
-    if (!resolved || !item.storageKey) return "";
-    try {
+/**
+ * 将参考素材解析为 Agnes 可接受的素材引用（公网 URL 或 Data URI Base64）。
+ * 优先级：
+ *  1. 已有公网 http(s) URL → 直接透传
+ *  2. ReferenceImage.dataUrl（本地上传素材一定有的 base64）→ 直接透传
+ *  3. 本地 storageKey → getMediaBlob 读成 Data URI
+ *  4. 其他本地 URL → fetch 读成 Data URI
+ */
+async function resolveAgnesMediaRef(item: { storageKey?: string; url?: string; dataUrl?: string }): Promise<string> {
+    // 1. 公网 URL 直接透传
+    const rawUrl = item.url || "";
+    if (rawUrl && /^https?:\/\//i.test(rawUrl)) return rawUrl;
+    // 2. ReferenceImage.dataUrl（本地上传素材直接携带的 base64）
+    if (item.dataUrl && /^data:/i.test(item.dataUrl)) return item.dataUrl;
+    // 3. 本地 storageKey → blob → Data URI
+    if (item.storageKey) {
         const blob = await getMediaBlob(item.storageKey);
-        if (!blob || !blob.size) return "";
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(blob);
-        });
-        return dataUrl;
-    } catch {
-        return "";
+        if (blob && blob.size) {
+            const dataUrl = await blobToDataUrl(blob);
+            if (dataUrl) return dataUrl;
+        }
     }
+    // 4. 兜底：任意可 fetch 的 URL 读成 Data URI
+    const resolved = item.storageKey ? await resolveMediaUrl(item.storageKey, item.url || "") : item.url || "";
+    if (resolved && !resolved.startsWith("data:")) {
+        try {
+            const dataUrl = await blobToDataUrl(await (await fetch(resolved)).blob());
+            if (dataUrl) return dataUrl;
+        } catch {
+            // fetch 失败则返回空
+        }
+    }
+    return "";
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+    });
 }
 
 /** 构建 Agnes 视频创建任务请求体（严格字段白名单：text/keyframe/reference 三种模式）。 */
