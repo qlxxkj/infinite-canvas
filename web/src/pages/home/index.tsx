@@ -65,8 +65,8 @@ export default function IndexPage() {
         <main className="relative h-full overflow-y-auto bg-background text-stone-950 dark:text-stone-100">
             <section className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-7xl overflow-hidden px-6">
                 <div className="relative flex min-h-[620px] flex-col items-center justify-center pt-10 text-center">
-                    <h1 className="ai-title-aurora max-w-5xl text-balance text-5xl font-semibold tracking-normal sm:text-7xl lg:text-8xl">{t("meta.title")}</h1>
-                    <p className="mt-6 max-w-3xl text-balance text-lg leading-8 text-stone-500 dark:text-stone-400">
+                    <h1 className="ai-title-aurora max-w-5xl text-balance text-6xl font-semibold tracking-normal sm:text-7xl lg:text-8xl">{t("meta.title")}</h1>
+                    <p className="mt-8 max-w-3xl text-balance text-lg leading-8 text-stone-500 dark:text-stone-400">
                         <Trans i18nKey="home.description" components={{ canvas: <Highlighter action="underline" color="#FF9800" />, content: <Highlighter action="highlight" color="#87CEFA" /> }} />
                     </p>
 
@@ -74,20 +74,24 @@ export default function IndexPage() {
                     {promptShowcase.length > 0 && (
                         <div className="mt-6 w-full max-w-7xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
-                            {/* Prompt 输入框：固定高度（2 行文本），对齐参考设计 —— 半透明毛玻璃悬浮在卡片底部，#2E96FF 蓝色按钮 */}
-                            <div className="relative z-40 mx-auto -mt-32 flex h-24 max-w-3xl items-center gap-4 overflow-hidden rounded-3xl border border-stone-300/40 bg-white/70 px-6 py-4 text-left shadow-2xl backdrop-blur-[33px] dark:border-white/10 dark:bg-stone-900/55">
-                                <span className={cn("hero-typewriter-cursor shrink-0 text-[#2E96FF]", caret && "hero-caret-on")} />
-                                <span className="flex-1 overflow-hidden text-ellipsis text-sm leading-6 text-stone-700 dark:text-stone-200" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                                    {typedPrompt}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate("/image")}
-                                    className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-medium text-white shadow-md transition hover:opacity-90"
-                                    style={{ backgroundColor: "#2E96FF" }}
-                                >
-                                    {t("home.heroCarousel.tryIt")}
-                                </button>
+                            {/* Prompt 输入框：对齐参考 —— 纵向布局（提示词在上，按钮右下角），悬浮在卡片底部 */}
+                            <div className="relative z-40 mx-auto -mt-32 flex h-28 max-w-3xl flex-col justify-between gap-3 overflow-hidden rounded-3xl border border-stone-300/40 bg-white/70 px-6 py-5 text-left shadow-2xl backdrop-blur-[33px] dark:border-white/10 dark:bg-stone-900/55">
+                                <div className="flex flex-1 items-start gap-3">
+                                    <span className={cn("hero-typewriter-cursor shrink-0 text-[#2E96FF]", caret && "hero-caret-on")} />
+                                    <span className="flex-1 overflow-hidden text-sm leading-6 text-stone-700 dark:text-stone-200" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                                        {typedPrompt}
+                                    </span>
+                                </div>
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate("/image")}
+                                        className="rounded-xl px-5 py-2.5 text-sm font-medium text-white shadow-md transition hover:opacity-90"
+                                        style={{ backgroundColor: "#2E96FF" }}
+                                    >
+                                        {t("home.heroCarousel.tryIt")}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}

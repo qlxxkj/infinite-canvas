@@ -43,8 +43,10 @@ function slotFor(index: number, active: number, total: number): Slot {
     return { distance, side, visible: distance <= maxVisible };
 }
 
-/** 按槽位返回 3D 变换。位移按「缩放后实际宽度 + 层间显式间隙」计算，
- *  确保相邻层不叠压：中心卡两侧留 gap，第 1 层与第 2 层之间也留 gap。 */
+/** 按槽位返回 3D 变换。
+ *  中心 0；左右 1 层 translateX(±96%) scale(.873) opacity .8；
+ *  左右 2 层 translateX(±198%) scale(.783) opacity .25（最外侧淡出）；更远的藏出视口。
+ *  位移按「缩放后实际宽度 + 层间 36px 间隙」计算，确保相邻层不叠压。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
     // 桌面中心卡 380px、第1层 332px(0.873)、第2层 298px(0.783)；手机 210/143/126
     const cardW = isMobile ? 210 : 380;
@@ -269,12 +271,12 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
     );
 });
 
-/** 左右切换按钮（胶囊样式，水平成对放在提示词输入框下方，对齐参考） */
+/** 左右切换按钮（胶囊样式，水平成对放在提示词输入框下方，对齐参考：浅灰容器 + 圆角胶囊按钮） */
 export function CarouselArrows({ onPrev, onNext, prevLabel, nextLabel }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string }) {
     const baseBtn =
-        "flex h-9 w-12 items-center justify-center rounded-full border border-stone-300/50 bg-white/80 text-stone-700 shadow-md backdrop-blur transition hover:bg-white dark:border-stone-700/50 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800";
+        "flex h-9 w-12 items-center justify-center rounded-lg border border-stone-300/40 bg-white/85 text-stone-700 transition hover:bg-white dark:border-stone-700/40 dark:bg-stone-800/85 dark:text-stone-200 dark:hover:bg-stone-800";
     return (
-        <div className="mt-10 flex items-center justify-center gap-2 rounded-2xl border border-stone-300/40 bg-stone-100/80 p-1.5 backdrop-blur dark:border-stone-700/40 dark:bg-stone-900/80">
+        <div className="mt-10 flex items-center justify-center gap-2 rounded-2xl border border-stone-300/40 bg-stone-100/90 p-1.5 backdrop-blur dark:border-stone-700/40 dark:bg-stone-900/90">
             <button type="button" onClick={onPrev} aria-label={prevLabel} className={baseBtn}>
                 <ChevronLeft className="size-5" />
             </button>
