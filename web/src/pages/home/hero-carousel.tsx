@@ -43,26 +43,36 @@ function slotFor(index: number, active: number, total: number): Slot {
     return { distance, side, visible: distance <= maxVisible };
 }
 
-/** 按槽位返回 3D 变换。参数对齐参考设计(Google AI Studio hero)：
- *  中心 0；左右 1 层 translateX(±96%) scale(.873) opacity .8；
- *  左右 2 层 translateX(±198%) scale(.783) opacity .4；更远的藏出视口。 */
+/** 按槽位返回 3D 变换。位移按「缩放后实际宽度 + 层间显式间隙」计算，
+ *  确保相邻层不叠压：中心卡两侧留 gap，第 1 层与第 2 层之间也留 gap。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
+    // 桌面中心卡 380px、第1层 332px(0.873)、第2层 298px(0.783)；手机 210/143/126
+    const cardW = isMobile ? 210 : 380;
+    const gap = isMobile ? 10 : 36; // 相邻卡之间保留的间隙
+    const scale1 = isMobile ? 0.68 : 0.873;
+    const scale2 = isMobile ? 0.6 : 0.783;
+    const w1 = cardW * scale1;
+    const w2 = cardW * scale2;
+    // 中心卡中心到第1层卡中心的距离 = 中心半宽 + gap + 第1层半宽
+    const x1 = ((cardW + gap + w1) / 2) / cardW * 100;
+    // 第1层中心到第2层中心的距离 = 第1层半宽 + gap + 第2层半宽（桌面收 0.9 倍，避免总宽超出视口）
+    const step2 = ((w1 + gap + w2) / 2) / cardW * 100 * (isMobile ? 1 : 0.9);
     if (slot.distance === 0) {
         return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
     }
     if (slot.distance === 1) {
-        const scale = isMobile ? 0.68 : 0.873;
-        const x = isMobile ? 56 : 96;
+        const off = (slot.side * x1).toFixed(1);
         return {
-            transform: `translateX(${slot.side * x}%) scale(${scale}) translateZ(-120px)`,
+            transform: `translateX(${off}%) scale(${scale1}) translateZ(-120px)`,
             opacity: 0.8,
             zIndex: 20,
         };
     }
-    // distance >= 2（桌面第 2 层）
+    // distance >= 2（桌面第 2 层，最外侧淡出）
+    const off2 = (slot.side * (x1 + step2)).toFixed(1);
     return {
-        transform: `translateX(${slot.side * (isMobile ? 120 : 198)}%) scale(${isMobile ? 0.6 : 0.783}) translateZ(-240px)`,
-        opacity: isMobile ? 0.5 : 0.4,
+        transform: `translateX(${off2}%) scale(${scale2}) translateZ(-240px)`,
+        opacity: isMobile ? 0.5 : 0.25,
         zIndex: 10,
     };
 }
