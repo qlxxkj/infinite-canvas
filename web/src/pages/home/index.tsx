@@ -57,7 +57,7 @@ export default function IndexPage() {
                         <div className="mt-12 w-full max-w-4xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
                             {/* Prompt 输入框（打字机显示当前卡 prompt） */}
-                            <div className="mx-auto mt-6 flex max-w-2xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/80 px-4 py-3 text-left shadow-lg backdrop-blur dark:border-stone-800 dark:bg-stone-900/80">
+                            <div className="mx-auto mt-6 flex min-h-14 max-w-2xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/80 px-4 py-4 text-left shadow-lg backdrop-blur dark:border-stone-800 dark:bg-stone-900/80">
                                 <span className={cn("hero-typewriter-cursor shrink-0", caret && "hero-caret-on")} />
                                 <span className="min-h-5 flex-1 truncate text-sm text-stone-700 dark:text-stone-200">{typedPrompt}</span>
                                 <button
@@ -72,7 +72,7 @@ export default function IndexPage() {
                     )}
                 </div>
 
-                <section className="relative mx-auto mb-20 max-w-6xl border-t border-stone-200 pt-12 dark:border-stone-800">
+                <section className="relative mx-auto mb-20 max-w-6xl pt-12">
                     <div className="mb-8 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-start">
                         <div />
                         <div className="max-w-2xl text-center">

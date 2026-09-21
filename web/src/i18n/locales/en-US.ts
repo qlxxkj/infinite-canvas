@@ -350,7 +350,7 @@ export default {
             prev: "Previous",
             next: "Next",
             dots: "Dots",
-            tryIt: "Try it",
+            tryIt: "Get started",
         },
         promptError: "Failed to load prompts",
         description: "Generate, connect, and reshape <content>images, text, and graphics</content> in <canvas>Infinite Canvas</canvas>, turning one-off generations into a continuous creative process.",

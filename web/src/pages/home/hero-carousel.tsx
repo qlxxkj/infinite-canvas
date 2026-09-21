@@ -43,24 +43,24 @@ function slotFor(index: number, active: number, total: number): Slot {
     return { distance, side, visible: distance <= maxVisible };
 }
 
-/** 按槽位返回 3D 变换。用单一 CSS transform 字符串（motion 不直接支持 rotateY/translateZ）。 */
+/** 按槽位返回 3D 变换。用单一 CSS transform 字符串（motion 不直接支持 rotateY/translateZ）。
+ *  需求：两边卡片不倾斜（只有横向位移），中间蓝光更明显。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
     if (slot.distance === 0) {
-        return { transform: "translateX(0%) rotateY(0deg) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
+        return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
     }
     if (slot.distance === 1) {
-        const scale = isMobile ? 0.6 : 0.82;
-        const rotate = isMobile ? 30 : 38;
-        const x = isMobile ? 42 : 62;
+        const scale = isMobile ? 0.62 : 0.8;
+        const x = isMobile ? 46 : 66;
         return {
-            transform: `translateX(${slot.side * x}%) rotateY(${slot.side * -rotate}deg) scale(${scale}) translateZ(-120px)`,
+            transform: `translateX(${slot.side * x}%) scale(${scale}) translateZ(-120px)`,
             opacity: 0.55,
             zIndex: 20,
         };
     }
     // distance >= 2（桌面第 2 层）
     return {
-        transform: `translateX(${slot.side * 118}%) rotateY(${slot.side * -52}deg) scale(0.66) translateZ(-240px)`,
+        transform: `translateX(${slot.side * 124}%) scale(0.62) translateZ(-240px)`,
         opacity: 0.22,
         zIndex: 10,
     };
@@ -212,7 +212,7 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
             aria-label={t("home.heroCarousel.region")}
         >
             <div
-                className="relative mx-auto flex h-[280px] w-full items-center justify-center sm:h-[340px] md:h-[400px]"
+                className="relative mx-auto flex h-[340px] w-full items-center justify-center sm:h-[420px] md:h-[520px]"
                 style={{ transformStyle: "preserve-3d" }}
             >
                 {items.map((item, idx) => {
@@ -226,12 +226,8 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                             type="button"
                             onClick={() => !isCenter && goTo(idx)}
                             className={cn(
-                                "hero-card absolute flex h-[190px] w-[150px] flex-col overflow-hidden rounded-2xl border bg-stone-100 text-left shadow-lg sm:h-[240px] sm:w-[190px] md:h-[300px] md:w-[230px]",
-                                isCenter
-                                    ? "border-white/60 dark:border-white/15"
-                                    : slot.distance === 1
-                                      ? "border-stone-200/60 dark:border-stone-700/40"
-                                      : "border-stone-200/40 dark:border-stone-800/40",
+                                "hero-card absolute flex h-[260px] w-[210px] flex-col overflow-hidden rounded-3xl bg-stone-100 text-left sm:h-[330px] sm:w-[270px] md:h-[440px] md:w-[360px]",
+                                isCenter ? "shadow-2xl" : "shadow-lg",
                             )}
                             style={{ zIndex: tf.zIndex }}
                             initial={false}
@@ -242,13 +238,11 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                             transition={CAROUSEL_TRANSITION}
                         >
                             <CardMedia item={item} />
-                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent p-3 text-white">
-                                <h3 className="truncate text-sm font-medium">{item.title}</h3>
-                                {item.tags.length > 0 && <p className="mt-0.5 truncate text-[11px] text-white/70">{item.tags.slice(0, 2).join(" · ")}</p>}
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 text-white">
+                                <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
+                                {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
                             </div>
-                            {isCenter && (
-                                <span className="pointer-events-none absolute inset-0 rounded-2xl" style={{ boxShadow: "0 0 60px -12px var(--hero-glow)" }} />
-                            )}
+                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl hero-center-glow" />}
                         </motion.button>
                     );
                 })}
