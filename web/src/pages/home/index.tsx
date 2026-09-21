@@ -75,13 +75,14 @@ export default function IndexPage() {
                         <div className="mt-6 w-full max-w-7xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
                             {/* Prompt 输入框：上移覆盖卡片下缘约 1/3 */}
-                            <div className="relative z-40 mx-auto -mt-40 flex min-h-24 max-w-3xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/85 px-5 py-5 text-left shadow-xl backdrop-blur dark:border-stone-800 dark:bg-stone-900/85">
+                            <div className="relative z-40 mx-auto -mt-40 flex min-h-24 max-w-3xl items-center gap-3 rounded-2xl border border-white/50 bg-white/40 px-5 py-5 text-left shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-stone-900/40">
                                 <span className={cn("hero-typewriter-cursor shrink-0", caret && "hero-caret-on")} />
-                                <span className="min-h-5 flex-1 truncate text-sm text-stone-700 dark:text-stone-200">{typedPrompt}</span>
+                                <span className="min-h-5 flex-1 whitespace-pre-wrap break-words text-sm leading-6 text-stone-700 dark:text-stone-200">{typedPrompt}</span>
                                 <button
                                     type="button"
                                     onClick={() => navigate("/image")}
-                                    className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
+                                    className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-md transition hover:opacity-90"
+                                    style={{ backgroundColor: "#2E96FF" }}
                                 >
                                     {t("home.heroCarousel.tryIt")}
                                 </button>
@@ -90,7 +91,7 @@ export default function IndexPage() {
                     )}
                 </div>
 
-                <section className="relative mx-auto mb-20 max-w-6xl pt-12">
+                <section className="relative mx-auto mb-20 max-w-6xl pt-24">
                     <div className="mb-8 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-start">
                         <div />
                         <div className="max-w-2xl text-center">

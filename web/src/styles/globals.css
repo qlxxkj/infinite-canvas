@@ -51,7 +51,7 @@
 :root {
     --radius: 0.625rem;
     --border: oklch(0.922 0 0);
-    --hero-glow: rgba(37, 99, 235, 0.6);
+    --hero-glow: rgba(46, 150, 255, 0.95);
     --ring: oklch(0.708 0 0);
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -86,7 +86,7 @@
 
 .dark {
     --background: oklch(0.145 0 0);
-    --hero-glow: rgba(59, 130, 246, 0.8);
+    --hero-glow: rgba(46, 150, 255, 1);
     --foreground: oklch(0.985 0 0);
     --border: oklch(1 0 0 / 10%);
     --ring: oklch(0.556 0 0);
@@ -185,10 +185,27 @@
         object-fit: cover;
     }
 
-    .hero-center-glow {
-        box-shadow:
-            0 0 90px -10px var(--hero-glow),
-            0 0 180px -30px var(--hero-glow);
+    .hero-bottom-glow {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        border-radius: inherit;
+        pointer-events: none;
+    }
+
+    .hero-bottom-glow::after {
+        content: "";
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        bottom: -42px;
+        height: 80px;
+        background: radial-gradient(
+            ellipse 65% 100% at 50% 100%,
+            var(--hero-glow) 0%,
+            transparent 75%
+        );
+        filter: blur(18px);
     }
 
     .hero-typewriter-cursor {
