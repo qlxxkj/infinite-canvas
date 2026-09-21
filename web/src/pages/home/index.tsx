@@ -62,7 +62,7 @@ export default function IndexPage() {
     }, [message]);
 
     return (
-        <main className="relative h-full overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] text-stone-950 dark:bg-[radial-gradient(rgba(245,245,244,.18)_1px,transparent_1px)] dark:text-stone-100">
+        <main className="relative h-full overflow-y-auto bg-background text-stone-950 dark:text-stone-100">
             <section className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-7xl overflow-hidden px-6">
                 <div className="relative flex min-h-[620px] flex-col items-center justify-center pt-10 text-center">
                     <h1 className="ai-title-aurora max-w-5xl text-balance text-5xl font-semibold tracking-normal sm:text-7xl lg:text-8xl">{t("meta.title")}</h1>
@@ -72,16 +72,16 @@ export default function IndexPage() {
 
                     {/* 3D 环形 Cover Flow 轮播：数据 = 提示词卡，切换时 prompt 打字机联动 */}
                     {promptShowcase.length > 0 && (
-                        <div className="mt-12 w-full max-w-7xl overflow-x-clip px-2">
+                        <div className="mt-6 w-full max-w-7xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
-                            {/* Prompt 输入框（打字机显示当前卡 prompt）：上移覆盖卡片下缘约 1/4 */}
-                            <div className="relative z-40 mx-auto -mt-28 flex min-h-24 max-w-xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/85 px-5 py-5 text-left shadow-xl backdrop-blur dark:border-stone-800 dark:bg-stone-900/85">
+                            {/* Prompt 输入框：上移覆盖卡片下缘约 1/3 */}
+                            <div className="relative z-40 mx-auto -mt-40 flex min-h-24 max-w-3xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/85 px-5 py-5 text-left shadow-xl backdrop-blur dark:border-stone-800 dark:bg-stone-900/85">
                                 <span className={cn("hero-typewriter-cursor shrink-0", caret && "hero-caret-on")} />
                                 <span className="min-h-5 flex-1 truncate text-sm text-stone-700 dark:text-stone-200">{typedPrompt}</span>
                                 <button
                                     type="button"
                                     onClick={() => navigate("/image")}
-                                    className="shrink-0 rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-medium text-white transition hover:opacity-90 dark:bg-stone-100 dark:text-stone-900"
+                                    className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
                                 >
                                     {t("home.heroCarousel.tryIt")}
                                 </button>

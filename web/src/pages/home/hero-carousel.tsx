@@ -44,7 +44,7 @@ function slotFor(index: number, active: number, total: number): Slot {
 }
 
 /** 按槽位返回 3D 变换。用单一 CSS transform 字符串（motion 不直接支持 rotateY/translateZ）。
- *  需求：两边卡片不倾斜（只有横向位移），中间蓝光更明显，两侧卡与中间卡保留间距不重叠。 */
+ *  需求：两边卡片不倾斜（只有横向位移），两侧卡与中间卡保留间距不重叠，卡片不降透明度。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
     if (slot.distance === 0) {
         return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
@@ -54,14 +54,14 @@ function slotTransform(slot: Slot, isMobile: boolean) {
         const x = isMobile ? 58 : 82;
         return {
             transform: `translateX(${slot.side * x}%) scale(${scale}) translateZ(-120px)`,
-            opacity: 0.55,
+            opacity: 1,
             zIndex: 20,
         };
     }
     // distance >= 2（桌面第 2 层）
     return {
         transform: `translateX(${slot.side * 140}%) scale(0.62) translateZ(-240px)`,
-        opacity: 0.22,
+        opacity: 1,
         zIndex: 10,
     };
 }
@@ -246,37 +246,39 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                                 <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
                                 {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
                             </div>
-                            {isCenter && <span className="hero-center-glow pointer-events-none absolute inset-0 rounded-3xl" />}
+                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl" style={{ boxShadow: "0 0 60px -12px var(--hero-glow)" }} />}
                         </motion.div>
                     );
                 })}
             </div>
 
-            {/* 左右箭头（桌面 + 平板） */}
-            {!isMobile && total >= 3 && (
-                <>
-                    <CarouselArrow direction="prev" onClick={prev} label={t("home.heroCarousel.prev")} />
-                    <CarouselArrow direction="next" onClick={next} label={t("home.heroCarousel.next")} />
-                </>
-            )}
+            {/* 底部控制：左右切换按钮（放在提示词输入框下方，由父级布局） */}
+            {!isMobile && total >= 3 && <CarouselArrows onPrev={prev} onNext={next} prevLabel={t("home.heroCarousel.prev")} nextLabel={t("home.heroCarousel.next")} />}
         </div>
     );
 });
 
-function CarouselArrow({ direction, onClick, label }: { direction: "prev" | "next"; onClick: () => void; label: string }) {
-    const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
+/** 左右切换按钮（放在轮播底部，水平排列，由父级决定位置） */
+export function CarouselArrows({ onPrev, onNext, prevLabel, nextLabel }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string }) {
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-label={label}
-            className={cn(
-                "absolute top-1/2 z-40 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200/70 bg-white/80 text-stone-700 shadow-lg backdrop-blur transition hover:scale-105 hover:bg-white dark:border-stone-700/60 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800",
-                direction === "prev" ? "left-2 md:left-6" : "right-2 md:right-6",
-            )}
-        >
-            <Icon className="size-5" />
-        </button>
+        <div className="flex items-center justify-center gap-3">
+            <button
+                type="button"
+                onClick={onPrev}
+                aria-label={prevLabel}
+                className="flex size-10 items-center justify-center rounded-full border border-stone-200/70 bg-white/80 text-stone-700 shadow-lg backdrop-blur transition hover:scale-105 hover:bg-white dark:border-stone-700/60 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800"
+            >
+                <ChevronLeft className="size-5" />
+            </button>
+            <button
+                type="button"
+                onClick={onNext}
+                aria-label={nextLabel}
+                className="flex size-10 items-center justify-center rounded-full border border-stone-200/70 bg-white/80 text-stone-700 shadow-lg backdrop-blur transition hover:scale-105 hover:bg-white dark:border-stone-700/60 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800"
+            >
+                <ChevronRight className="size-5" />
+            </button>
+        </div>
     );
 }
 
