@@ -247,7 +247,7 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                                 <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
                                 {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
                             </div>
-                            {isCenter && <span className="pointer-events-none absolute -inset-[30px] rounded-[24px] hero-card-glow" />}
+                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl hero-card-glow" />}
                         </motion.div>
                     );
                 })}

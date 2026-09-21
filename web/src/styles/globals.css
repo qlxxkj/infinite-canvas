@@ -185,12 +185,15 @@
         object-fit: cover;
     }
 
-    /* 中心卡整卡蓝光晕（对齐参考：inset:-30px, 蓝底, blur 60px, opacity .8） */
+    /* 中心卡整卡蓝光晕（box-shadow 实现） */
     .hero-card-glow {
-        background: #2e96ff;
-        filter: blur(60px);
-        opacity: 0.8;
-        z-index: -1;
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow:
+            0 0 60px -10px var(--hero-glow),
+            0 0 160px -20px var(--hero-glow);
+        pointer-events: none;
     }
 
     .hero-typewriter-cursor {

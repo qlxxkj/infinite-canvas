@@ -74,10 +74,12 @@ export default function IndexPage() {
                     {promptShowcase.length > 0 && (
                         <div className="mt-6 w-full max-w-7xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
-                            {/* Prompt 输入框：对齐参考设计 —— 深色半透明毛玻璃悬浮在卡片底部，#2E96FF 蓝色按钮 */}
-                            <div className="relative z-40 mx-auto -mt-32 flex min-h-24 max-w-3xl items-center gap-4 rounded-3xl border border-stone-300/40 bg-white/70 px-6 py-6 text-left shadow-2xl backdrop-blur-[33px] dark:border-white/10 dark:bg-stone-900/55">
+                            {/* Prompt 输入框：固定高度（2 行文本），对齐参考设计 —— 半透明毛玻璃悬浮在卡片底部，#2E96FF 蓝色按钮 */}
+                            <div className="relative z-40 mx-auto -mt-32 flex h-24 max-w-3xl items-center gap-4 overflow-hidden rounded-3xl border border-stone-300/40 bg-white/70 px-6 py-4 text-left shadow-2xl backdrop-blur-[33px] dark:border-white/10 dark:bg-stone-900/55">
                                 <span className={cn("hero-typewriter-cursor shrink-0 text-[#2E96FF]", caret && "hero-caret-on")} />
-                                <span className="min-h-5 flex-1 whitespace-pre-wrap break-words text-sm leading-6 text-stone-700 dark:text-stone-200">{typedPrompt}</span>
+                                <span className="flex-1 overflow-hidden text-ellipsis text-sm leading-6 text-stone-700 dark:text-stone-200" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                                    {typedPrompt}
+                                </span>
                                 <button
                                     type="button"
                                     onClick={() => navigate("/image")}
