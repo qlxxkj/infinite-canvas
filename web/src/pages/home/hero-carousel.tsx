@@ -43,26 +43,26 @@ function slotFor(index: number, active: number, total: number): Slot {
     return { distance, side, visible: distance <= maxVisible };
 }
 
-/** 按槽位返回 3D 变换。用单一 CSS transform 字符串（motion 不直接支持 rotateY/translateZ）。
- *  需求：两边卡片不倾斜（只有横向位移），两侧卡与中间卡保留间距不重叠，
- *  中间卡底部蓝光（通过 CSS 变量控制），侧卡稍暗。 */
+/** 按槽位返回 3D 变换。参数对齐参考设计(Google AI Studio hero)：
+ *  中心 0；左右 1 层 translateX(±96%) scale(.873) opacity .8；
+ *  左右 2 层 translateX(±198%) scale(.783) opacity .4；更远的藏出视口。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
     if (slot.distance === 0) {
         return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
     }
     if (slot.distance === 1) {
-        const scale = isMobile ? 0.62 : 0.8;
-        const x = isMobile ? 62 : 92;
+        const scale = isMobile ? 0.68 : 0.873;
+        const x = isMobile ? 56 : 96;
         return {
             transform: `translateX(${slot.side * x}%) scale(${scale}) translateZ(-120px)`,
-            opacity: 0.85,
+            opacity: 0.8,
             zIndex: 20,
         };
     }
     // distance >= 2（桌面第 2 层）
     return {
-        transform: `translateX(${slot.side * 160}%) scale(0.62) translateZ(-240px)`,
-        opacity: 0.4,
+        transform: `translateX(${slot.side * (isMobile ? 120 : 198)}%) scale(${isMobile ? 0.6 : 0.783}) translateZ(-240px)`,
+        opacity: isMobile ? 0.5 : 0.4,
         zIndex: 10,
     };
 }
@@ -247,7 +247,7 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                                 <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
                                 {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
                             </div>
-                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl hero-bottom-glow" />}
+                            {isCenter && <span className="pointer-events-none absolute -inset-[30px] rounded-[24px] hero-card-glow" />}
                         </motion.div>
                     );
                 })}
@@ -259,12 +259,12 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
     );
 });
 
-/** 左右切换按钮（3:2 长方形，水平排列，放在提示词输入框下方） */
+/** 左右切换按钮（胶囊样式，水平成对放在提示词输入框下方，对齐参考） */
 export function CarouselArrows({ onPrev, onNext, prevLabel, nextLabel }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string }) {
     const baseBtn =
-        "flex h-10 w-15 items-center justify-center rounded-full border border-stone-200/70 bg-white/80 text-stone-700 shadow-lg backdrop-blur transition hover:scale-105 hover:bg-white dark:border-stone-700/60 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800";
+        "flex h-9 w-12 items-center justify-center rounded-full border border-stone-300/50 bg-white/80 text-stone-700 shadow-md backdrop-blur transition hover:bg-white dark:border-stone-700/50 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-800";
     return (
-        <div className="flex items-center justify-center gap-3">
+        <div className="mt-10 flex items-center justify-center gap-2 rounded-2xl border border-stone-300/40 bg-stone-100/80 p-1.5 backdrop-blur dark:border-stone-700/40 dark:bg-stone-900/80">
             <button type="button" onClick={onPrev} aria-label={prevLabel} className={baseBtn}>
                 <ChevronLeft className="size-5" />
             </button>

@@ -185,27 +185,12 @@
         object-fit: cover;
     }
 
-    .hero-bottom-glow {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        border-radius: inherit;
-        pointer-events: none;
-    }
-
-    .hero-bottom-glow::after {
-        content: "";
-        position: absolute;
-        left: 8%;
-        right: 8%;
-        bottom: -42px;
-        height: 80px;
-        background: radial-gradient(
-            ellipse 65% 100% at 50% 100%,
-            var(--hero-glow) 0%,
-            transparent 75%
-        );
-        filter: blur(18px);
+    /* 中心卡整卡蓝光晕（对齐参考：inset:-30px, 蓝底, blur 60px, opacity .8） */
+    .hero-card-glow {
+        background: #2e96ff;
+        filter: blur(60px);
+        opacity: 0.8;
+        z-index: -1;
     }
 
     .hero-typewriter-cursor {

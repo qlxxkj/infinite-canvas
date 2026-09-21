@@ -74,14 +74,14 @@ export default function IndexPage() {
                     {promptShowcase.length > 0 && (
                         <div className="mt-6 w-full max-w-7xl overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
-                            {/* Prompt 输入框：上移覆盖卡片下缘约 1/3 */}
-                            <div className="relative z-40 mx-auto -mt-40 flex min-h-24 max-w-3xl items-center gap-3 rounded-2xl border border-white/50 bg-white/40 px-5 py-5 text-left shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-stone-900/40">
-                                <span className={cn("hero-typewriter-cursor shrink-0", caret && "hero-caret-on")} />
+                            {/* Prompt 输入框：对齐参考设计 —— 深色半透明毛玻璃悬浮在卡片底部，#2E96FF 蓝色按钮 */}
+                            <div className="relative z-40 mx-auto -mt-32 flex min-h-24 max-w-3xl items-center gap-4 rounded-3xl border border-stone-300/40 bg-white/70 px-6 py-6 text-left shadow-2xl backdrop-blur-[33px] dark:border-white/10 dark:bg-stone-900/55">
+                                <span className={cn("hero-typewriter-cursor shrink-0 text-[#2E96FF]", caret && "hero-caret-on")} />
                                 <span className="min-h-5 flex-1 whitespace-pre-wrap break-words text-sm leading-6 text-stone-700 dark:text-stone-200">{typedPrompt}</span>
                                 <button
                                     type="button"
                                     onClick={() => navigate("/image")}
-                                    className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-md transition hover:opacity-90"
+                                    className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-medium text-white shadow-md transition hover:opacity-90"
                                     style={{ backgroundColor: "#2E96FF" }}
                                 >
                                     {t("home.heroCarousel.tryIt")}
