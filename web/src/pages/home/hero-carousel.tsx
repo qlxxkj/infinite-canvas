@@ -44,14 +44,14 @@ function slotFor(index: number, active: number, total: number): Slot {
 }
 
 /** 按槽位返回 3D 变换。用单一 CSS transform 字符串（motion 不直接支持 rotateY/translateZ）。
- *  需求：两边卡片不倾斜（只有横向位移），中间蓝光更明显。 */
+ *  需求：两边卡片不倾斜（只有横向位移），中间蓝光更明显，两侧卡与中间卡保留间距不重叠。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
     if (slot.distance === 0) {
         return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
     }
     if (slot.distance === 1) {
         const scale = isMobile ? 0.62 : 0.8;
-        const x = isMobile ? 46 : 66;
+        const x = isMobile ? 58 : 82;
         return {
             transform: `translateX(${slot.side * x}%) scale(${scale}) translateZ(-120px)`,
             opacity: 0.55,
@@ -60,7 +60,7 @@ function slotTransform(slot: Slot, isMobile: boolean) {
     }
     // distance >= 2（桌面第 2 层）
     return {
-        transform: `translateX(${slot.side * 124}%) scale(0.62) translateZ(-240px)`,
+        transform: `translateX(${slot.side * 140}%) scale(0.62) translateZ(-240px)`,
         opacity: 0.22,
         zIndex: 10,
     };
@@ -211,23 +211,18 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
             role="region"
             aria-label={t("home.heroCarousel.region")}
         >
-            <div
-                className="relative mx-auto flex h-[340px] w-full items-center justify-center sm:h-[420px] md:h-[520px]"
-                style={{ transformStyle: "preserve-3d" }}
-            >
+            <div className="relative mx-auto flex h-[340px] w-full items-center justify-center sm:h-[420px] md:h-[560px]">
                 {items.map((item, idx) => {
                     const slot = slots[idx];
                     if (!slot.visible) return null;
                     const tf = slotTransform(slot, isMobile);
                     const isCenter = slot.distance === 0;
                     return (
-                        <motion.button
+                        <motion.div
                             key={item.id}
-                            type="button"
-                            onClick={() => !isCenter && goTo(idx)}
                             className={cn(
-                                "hero-card absolute flex h-[260px] w-[210px] flex-col overflow-hidden rounded-3xl bg-stone-100 text-left sm:h-[330px] sm:w-[270px] md:h-[440px] md:w-[360px]",
-                                isCenter ? "shadow-2xl" : "shadow-lg",
+                                "hero-card absolute flex h-[260px] w-[210px] flex-col overflow-hidden rounded-3xl bg-stone-100 text-left sm:h-[340px] sm:w-[280px] md:h-[460px] md:w-[380px]",
+                                isCenter ? "cursor-default shadow-2xl" : "cursor-pointer",
                             )}
                             style={{ zIndex: tf.zIndex }}
                             initial={false}
@@ -236,14 +231,23 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                                 opacity: tf.opacity,
                             }}
                             transition={CAROUSEL_TRANSITION}
+                            onClick={() => !isCenter && goTo(idx)}
+                            role={isCenter ? undefined : "button"}
+                            tabIndex={isCenter ? undefined : 0}
+                            onKeyDown={(e) => {
+                                if (!isCenter && (e.key === "Enter" || e.key === " ")) {
+                                    e.preventDefault();
+                                    goTo(idx);
+                                }
+                            }}
                         >
                             <CardMedia item={item} />
                             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 text-white">
                                 <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
                                 {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
                             </div>
-                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl hero-center-glow" />}
-                        </motion.button>
+                            {isCenter && <span className="hero-center-glow pointer-events-none absolute inset-0 rounded-3xl" />}
+                        </motion.div>
                     );
                 })}
             </div>
@@ -254,40 +258,6 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                     <CarouselArrow direction="prev" onClick={prev} label={t("home.heroCarousel.prev")} />
                     <CarouselArrow direction="next" onClick={next} label={t("home.heroCarousel.next")} />
                 </>
-            )}
-
-            {/* 底部控制条：进度 + 圆点 */}
-            {total >= 2 && (
-                <div className="mt-6 flex flex-col items-center gap-3">
-                    {!isMobile && (
-                        <div className="h-0.5 w-40 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-                            <motion.div
-                                className="h-full bg-[var(--hero-glow)]"
-                                animate={{ width: `${Math.min(progress, 1) * 100}%` }}
-                                transition={{ duration: 0.1, ease: "linear" }}
-                            />
-                        </div>
-                    )}
-                    <div className="flex items-center gap-2" role="tablist" aria-label={t("home.heroCarousel.dots")}>
-                        {items.map((item, idx) => {
-                            const isActive = idx === active;
-                            return (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={isActive}
-                                    onClick={() => goTo(idx)}
-                                    className={cn(
-                                        "h-1.5 rounded-full transition-all duration-300",
-                                        isActive ? "w-5 bg-[var(--hero-glow)]" : "w-1.5 bg-stone-300 hover:bg-stone-400 dark:bg-stone-700 dark:hover:bg-stone-600",
-                                    )}
-                                    aria-label={`${t("home.heroCarousel.dots")} ${idx + 1}`}
-                                />
-                            );
-                        })}
-                    </div>
-                </div>
             )}
         </div>
     );

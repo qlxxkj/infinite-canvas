@@ -181,6 +181,10 @@
         border-radius: inherit;
     }
 
+    .hero-card > img {
+        object-fit: cover;
+    }
+
     .hero-center-glow {
         box-shadow:
             0 0 90px -10px var(--hero-glow),
