@@ -345,6 +345,13 @@ export default {
         darkTheme: "Switch to dark theme",
     },
     home: {
+        heroCarousel: {
+            region: "Capability carousel",
+            prev: "Previous",
+            next: "Next",
+            dots: "Dots",
+            tryIt: "Try it",
+        },
         promptError: "Failed to load prompts",
         description: "Generate, connect, and reshape <content>images, text, and graphics</content> in <canvas>Infinite Canvas</canvas>, turning one-off generations into a continuous creative process.",
         start: "Get started",

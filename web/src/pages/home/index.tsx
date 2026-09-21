@@ -8,6 +8,7 @@ import { fetchPrompts, type Prompt } from "@/services/api/prompts";
 import { navigationTools } from "@/constant/navigation-tools";
 import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
+import { HeroCarousel } from "./hero-carousel";
 
 function Highlighter({ action, color, children }: { action: "highlight" | "underline"; color: string; children?: ReactNode }) {
     return (
@@ -22,6 +23,27 @@ function Highlighter({ action, color, children }: { action: "highlight" | "under
     );
 }
 
+/** 打字机：text 变化时逐字重放，带闪烁光标 */
+function useTypewriter(text: string, speedMs = 28) {
+    const [shown, setShown] = useState("");
+    const [caret, setCaret] = useState(false);
+    useEffect(() => {
+        setShown("");
+        let i = 0;
+        const id = setInterval(() => {
+            i += 1;
+            setShown(text.slice(0, i));
+            if (i >= text.length) clearInterval(id);
+        }, speedMs);
+        return () => clearInterval(id);
+    }, [text, speedMs]);
+    useEffect(() => {
+        const id = setInterval(() => setCaret((c) => !c), 500);
+        return () => clearInterval(id);
+    }, []);
+    return { shown, caret };
+}
+
 export default function IndexPage() {
     const { message } = App.useApp();
     const { t } = useTranslation();
@@ -30,6 +52,10 @@ export default function IndexPage() {
     const [promptShowcase, setPromptShowcase] = useState<Prompt[]>([]);
     const [previewIndex, setPreviewIndex] = useState(0);
     const [previewOpen, setPreviewOpen] = useState(false);
+    const [heroIndex, setHeroIndex] = useState(0);
+
+    const activeCard = promptShowcase.length ? promptShowcase[heroIndex % promptShowcase.length] : undefined;
+    const { shown: typedPrompt, caret } = useTypewriter(activeCard?.prompt ?? "");
 
     useEffect(() => {
         void fetchPrompts({ pageSize: 12 })
@@ -48,6 +74,26 @@ export default function IndexPage() {
                     <p className="mt-8 max-w-3xl text-balance text-lg leading-8 text-stone-500 dark:text-stone-400">
                         <Trans i18nKey="home.description" components={{ canvas: <Highlighter action="underline" color="#FF9800" />, content: <Highlighter action="highlight" color="#87CEFA" /> }} />
                     </p>
+
+                    {/* 3D 环形 Cover Flow 轮播：数据 = 提示词卡，切换时 prompt 打字机联动 */}
+                    {promptShowcase.length > 0 && (
+                        <div className="mt-12 w-full max-w-4xl overflow-x-clip px-2">
+                            <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} />
+                            {/* Prompt 输入框（打字机显示当前卡 prompt） */}
+                            <div className="mx-auto mt-6 flex max-w-2xl items-center gap-3 rounded-2xl border border-stone-200 bg-white/80 px-4 py-3 text-left shadow-lg backdrop-blur dark:border-stone-800 dark:bg-stone-900/80">
+                                <span className={cn("hero-typewriter-cursor shrink-0", caret && "hero-caret-on")} />
+                                <span className="min-h-5 flex-1 truncate text-sm text-stone-700 dark:text-stone-200">{typedPrompt}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/image")}
+                                    className="shrink-0 rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-medium text-white transition hover:opacity-90 dark:bg-stone-100 dark:text-stone-900"
+                                >
+                                    {t("home.heroCarousel.tryIt")}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
                         <Button type="primary" size="large" onClick={() => navigate(`/${primaryTool.slug}`)} icon={<ArrowRight className="size-4" />} iconPlacement="end">
                             {t("home.start")}

@@ -51,6 +51,7 @@
 :root {
     --radius: 0.625rem;
     --border: oklch(0.922 0 0);
+    --hero-glow: rgba(37, 99, 235, 0.55);
     --ring: oklch(0.708 0 0);
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -85,6 +86,7 @@
 
 .dark {
     --background: oklch(0.145 0 0);
+    --hero-glow: rgba(59, 130, 246, 0.75);
     --foreground: oklch(0.985 0 0);
     --border: oklch(1 0 0 / 10%);
     --ring: oklch(0.556 0 0);
@@ -166,6 +168,34 @@
         50% {
             background-position: 100% 50%;
             filter: drop-shadow(0 12px 28px rgba(28, 25, 23, 0.08));
+        }
+    }
+
+    .hero-card {
+        backface-visibility: hidden;
+        will-change: transform;
+    }
+
+    .hero-typewriter-cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1.1em;
+        background: currentColor;
+        opacity: 0;
+    }
+
+    .hero-typewriter-cursor.hero-caret-on {
+        opacity: 0.9;
+        animation: hero-caret-blink 1s step-end infinite;
+    }
+
+    @keyframes hero-caret-blink {
+        0%,
+        100% {
+            opacity: 0.9;
+        }
+        50% {
+            opacity: 0.1;
         }
     }
 

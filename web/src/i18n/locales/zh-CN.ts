@@ -345,6 +345,13 @@ export default {
         darkTheme: "切换到深色主题",
     },
     home: {
+        heroCarousel: {
+            region: "能力轮播",
+            prev: "上一个",
+            next: "下一个",
+            dots: "圆点",
+            tryIt: "试试看",
+        },
         promptError: "获取提示词失败",
         description: "在 <canvas>无限画布</canvas> 中生成、连接和重组 <content>图片、文字与图形</content>，让创作从单次生成变成连续推演。",
         start: "开始使用",
