@@ -142,6 +142,62 @@
     }
 }
 
+/* 滚动时内容进入导航下方（毛玻璃由 .app-top-nav 提供）。
+   hero 区（轮播图所在区）底色纯黑 #000，其余区域统一 #121317 */
+.hero-zone {
+    background: #000000;
+    color: #fff;
+}
+
+/* 顶部导航：底色 #121317 @ 70% + blur 毛玻璃，白主文字、#cdd4dc 次级链接、hover 变白 */
+.app-top-nav {
+    background-color: #121317B3;
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+}
+
+.app-top-nav .anticon svg,
+.app-top-nav .text-stone-100,
+.app-top-nav .text-white {
+    color: #fff;
+}
+
+/* 导航链接（我的画布 / 生图工作台…）：参考 nav__link #cdd4dc，hover 变白 */
+.app-top-nav nav a {
+    color: #cdd4dc;
+    transition: color 0.2s;
+}
+
+.app-top-nav nav a:hover {
+    color: #fff;
+}
+
+/* 导航 logo 文字：白主色 */
+.app-top-nav > div > div:first-child > a span {
+    color: #fff;
+}
+
+/* 对齐参考 hero__header：headline 近白 64px margin-bottom 16px；subheadline 16px #b2bbc5 margin-bottom 48px */
+.hero-zone .ai-title-aurora {
+    background: linear-gradient(90deg, #fff 0%, #fff 36%, #d4d4d4 54%, #fff 72%, #fff 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 16px;
+    font-size: clamp(48px, 4.4vw, 64px);
+    line-height: 1;
+    letter-spacing: -1.44px;
+    font-weight: 450;
+}
+
+.hero-zone > div > p {
+    color: #b2bbc5;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+}
+
 @layer utilities {
     .ai-title-aurora {
         background: linear-gradient(90deg, #111827 0%, #111827 36%, #6b7280 54%, #111827 72%, #111827 100%);
@@ -185,38 +241,326 @@
         object-fit: cover;
     }
 
-    /* 中心卡整卡蓝光晕（box-shadow 实现） */
+    /* 中心卡整卡蓝光晕（对齐参考 Google AI Studio hero__card：inset:-30px + blur(60px) + opacity .8，垫在卡片后面，底部可见渗出） */
     .hero-card-glow {
         position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        box-shadow:
-            0 0 60px -10px var(--hero-glow),
-            0 0 160px -20px var(--hero-glow);
+        inset: -30px;
+        background: #2e96ff;
+        filter: blur(60px);
+        opacity: 0;
+        border-radius: 24px;
         pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .hero-card.center-glow > .hero-card-glow {
+        opacity: 0.8;
+        transition-delay: 0.2s;
+    }
+
+    /* 底部胶囊切换按钮（对齐参考 carousel-nav：#212226 底 + 8px 模糊，42x36 按钮，hover 白底黑字） */
+    .hero-carousel-nav {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: #212226;
+        border-radius: 12px;
+        backdrop-filter: blur(8px);
+        z-index: 50;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .hero-carousel-nav__btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 36px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .hero-carousel-nav__btn:hover {
+        background: #f8f9fc;
+        color: #050505;
+    }
+
+    /* hover 时箭头（currentColor svg）变黑，明显 */
+    .hero-carousel-nav__btn:hover svg {
+        color: #050505;
+        fill: #050505;
+        stroke: #050505;
     }
 
     .hero-typewriter-cursor {
-        display: inline-block;
-        width: 2px;
-        height: 1.1em;
-        background: currentColor;
         opacity: 0;
     }
 
     .hero-typewriter-cursor.hero-caret-on {
-        opacity: 0.9;
+        opacity: 1;
         animation: hero-caret-blink 1s step-end infinite;
     }
 
     @keyframes hero-caret-blink {
         0%,
         100% {
-            opacity: 0.9;
+            opacity: 1;
         }
         50% {
-            opacity: 0.1;
+            opacity: 0;
         }
+    }
+
+    /* 轨道可视区 = section 内容宽，右侧露半个被 section overflow-hidden 裁切（对齐参考） */
+    .home-slider-track {
+        width: calc(100% + 33.33333%);
+        scroll-behavior: smooth;
+    }
+
+    /* 末位占位卡：纯宽度，无 media 背景（滚动终点后留白被裁，让末卡显示全） */
+    .home-slider-card--spacer {
+        background: transparent;
+    }
+
+    /* 占位卡槽（宽 2/3 卡）：末卡后留白，使末卡滚到末尾时可再往左移 2/3 卡距离、完整露出 */
+    .home-slider-spacer--two-thirds {
+        width: calc(66.66666% - 7px);
+    }
+
+    .home-slider-card {
+        flex-shrink: 0;
+        width: calc(33.33333% - 11px);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .home-slider-media {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #212226;
+    }
+
+    .home-slider-overlay {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 48px);
+        height: 84px;
+        padding: 0 24px;
+        background: rgba(42, 44, 47, 0.27);
+        backdrop-filter: blur(25px);
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+        transition: background 0.2s;
+    }
+
+    .home-slider-card:hover .home-slider-overlay {
+        background: rgba(42, 44, 47, 0.4);
+    }
+
+    .home-remix-filter {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 8px;
+        padding: 12px 20px 12px 16px;
+        border-radius: 12px;
+        font-size: 17.5px;
+        line-height: 25.375px;
+        letter-spacing: 0.1925px;
+        color: #b2bbc5;
+        opacity: 0.8;
+        transition: all 0.2s;
+        cursor: pointer;
+        white-space: nowrap;
+        border: none;
+        background: none;
+        font-family: inherit;
+    }
+
+    .home-remix-filter:hover {
+        opacity: 1;
+        color: #fff;
+    }
+
+    .home-remix-filter.is-active {
+        background: #212226;
+        color: #fff;
+        opacity: 1;
+    }
+
+    .home-remix-card {
+        position: relative;
+        border-radius: 12px;
+        padding: 10px;
+        margin: -10px;
+        transition: background 0.2s;
+        cursor: pointer;
+        display: block;
+        background: transparent;
+        border: none;
+        text-align: left;
+        width: 100%;
+    }
+
+    .home-remix-card:hover {
+        background: #212226;
+    }
+
+    .home-remix-card:hover .home-remix-overlay {
+        opacity: 1;
+    }
+
+    .home-remix-thumb {
+        width: 100%;
+        aspect-ratio: 440 / 253;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .home-remix-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .home-remix-btn {
+        background: #fff;
+        color: #0e0f12;
+        font-weight: 500;
+        font-size: 14.5px;
+        line-height: 21px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+    }
+
+    .home-prompt-builder {
+        position: relative;
+        /* 无外框、高度同 hero、圆角 36px；底色跟其余区域统一 #121317 */
+        min-height: calc(100vh - 4rem);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 36px;
+        background: #121317;
+    }
+
+    /* 粒子舞动动效：参考 prompt-builder__bg —— 视频背景铺满 + mix-blend-mode:lighten，
+       与 hero 区 welcome_hero_particles.mp4 同一效果体系 */
+    .home-prompt-builder-particles {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        mix-blend-mode: lighten;
+        pointer-events: none;
+    }
+
+    /* hero 轮播区粒子视频铺底：左右收窄到跟沉淀区块的内容宽度对齐（1532px = 1580 - 两侧 24px 留白），
+       垂直保持轮播块 720px 限高不向下延伸；contain 保持 16:9 不拉伸 */
+    .hero-zone > div .hero-particles-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        max-width: 1532px;
+        height: 100%;
+        margin: 0 auto;
+        object-fit: contain;
+        object-position: center;
+        pointer-events: none;
+        background: #000;
+    }
+
+    .hero-zone > div .hero-particles-bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        /* hero 区底色纯黑(#000)，四周压暗渐变补位到同色，与粒子区融为一体 */
+        background:
+            linear-gradient(90deg, #000, transparent) 0 0 / 10% 100% no-repeat,
+            linear-gradient(270deg, #000, transparent) 100% 0 / 10% 100% no-repeat,
+            linear-gradient(180deg, #000, transparent) 0 0 / 100% 10% no-repeat,
+            linear-gradient(0deg, #000, transparent) 0 100% / 100% 10% no-repeat;
+    }
+
+    .home-prompt-input-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 24px;
+        width: 100%;
+        max-width: 669px;
+        background: #212226;
+        border: 1px solid #2f3034;
+        border-radius: 24px;
+        padding: 23px;
+    }
+
+    .home-prompt-suggestion {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: #787d8b;
+        letter-spacing: 0.11px;
+        transition: color 0.2s;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-family: inherit;
+        padding: 0;
+    }
+
+    .home-prompt-suggestion:hover {
+        color: #fff;
+    }
+
+    .home-case-card {
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        background: none;
+        border: none;
+        text-align: left;
+        padding: 0;
+        width: 100%;
+        font-family: inherit;
+    }
+
+    .home-case-thumb {
+        width: 100%;
+        aspect-ratio: 440 / 253;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 48px;
     }
 
     .hide-scrollbar {

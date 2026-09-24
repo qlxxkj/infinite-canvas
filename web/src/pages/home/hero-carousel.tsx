@@ -1,4 +1,3 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { type KeyboardEvent, type PointerEvent, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -43,22 +42,22 @@ function slotFor(index: number, active: number, total: number): Slot {
     return { distance, side, visible: distance <= maxVisible };
 }
 
-/** 按槽位返回 3D 变换。
- *  中心 0；左右 1 层 translateX(±96%) scale(.873) opacity .8；
- *  左右 2 层 translateX(±198%) scale(.783) opacity .25（最外侧淡出）；更远的藏出视口。
- *  位移按「缩放后实际宽度 + 层间 36px 间隙」计算，确保相邻层不叠压。 */
+/** 按槽位返回 3D 变换（对齐参考 hero__card：scale 与 opacity 逐层匹配）。
+ *  中心 0；左右 1 层 scale(.873) opacity .8（向中心靠拢，盖住中心卡边缘）；
+ *  左右 2 层 scale(.783) opacity .4（与第 1 层留间隙，最外侧淡出）；更远的藏出视口。 */
 function slotTransform(slot: Slot, isMobile: boolean) {
-    // 桌面中心卡 380px、第1层 332px(0.873)、第2层 298px(0.783)；手机 210/143/126
-    const cardW = isMobile ? 210 : 380;
-    const gap = isMobile ? 10 : 36; // 相邻卡之间保留的间隙
+    // 桌面中心卡 356px（对齐参考 hero__card），第1层 0.873、第2层 0.783；手机 210px
+    const cardW = isMobile ? 210 : 356;
+    // 第 1 层：间隙 0 → 向中心靠拢，侧卡盖住中心卡边缘（参考 356 卡时中心距 303.5px）
+    const gap1 = 0;
     const scale1 = isMobile ? 0.68 : 0.873;
-    const scale2 = isMobile ? 0.6 : 0.783;
     const w1 = cardW * scale1;
+    const x1 = ((cardW + gap1 + w1) / 2) / cardW * 100;
+    // 第 2 层：与第 1 层留 24px 间隙（参考 356 卡时中心距 629.5px ≈ 303.5 + 24 + 302）
+    const scale2 = isMobile ? 0.6 : 0.783;
     const w2 = cardW * scale2;
-    // 中心卡中心到第1层卡中心的距离 = 中心半宽 + gap + 第1层半宽
-    const x1 = ((cardW + gap + w1) / 2) / cardW * 100;
-    // 第1层中心到第2层中心的距离 = 第1层半宽 + gap + 第2层半宽（桌面收 0.9 倍，避免总宽超出视口）
-    const step2 = ((w1 + gap + w2) / 2) / cardW * 100 * (isMobile ? 1 : 0.9);
+    const gap2 = isMobile ? 10 : 24;
+    const x2 = x1 + ((w1 + gap2 + w2) / 2) / cardW * 100;
     if (slot.distance === 0) {
         return { transform: "translateX(0%) scale(1) translateZ(0px)", opacity: 1, zIndex: 30 };
     }
@@ -70,11 +69,11 @@ function slotTransform(slot: Slot, isMobile: boolean) {
             zIndex: 20,
         };
     }
-    // distance >= 2（桌面第 2 层，最外侧淡出）
-    const off2 = (slot.side * (x1 + step2)).toFixed(1);
+    // distance >= 2（第 2 层，与第 1 层留间隙，最外侧淡出）
+    const off2 = (slot.side * x2).toFixed(1);
     return {
         transform: `translateX(${off2}%) scale(${scale2}) translateZ(-240px)`,
-        opacity: isMobile ? 0.5 : 0.25,
+        opacity: isMobile ? 0.5 : 0.4,
         zIndex: 10,
     };
 }
@@ -83,10 +82,12 @@ type HeroCarouselProps = {
     items: Prompt[];
     activeIndex: number;
     onIndexChange: (index: number) => void;
+    /** 卡片媒体：传入视频 src（按卡索引轮换），缺省用 item.coverUrl 图片 */
+    cardVideos?: string[];
 };
 
 export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(function HeroCarousel(
-    { items, activeIndex, onIndexChange },
+    { items, activeIndex, onIndexChange, cardVideos },
     ref,
 ) {
     const { t } = useTranslation();
@@ -94,7 +95,6 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
     const [isMobile, setIsMobile] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [isPlaying, setIsPlaying] = useState(true);
-    const [progress, setProgress] = useState(0);
 
     const containerRef = useRef<HTMLDivElement | null>(null);
     const attachRef = useCallback(
@@ -127,28 +127,23 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
         return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }, []);
 
-    // 自动播放进度
+    // 自动播放计时：到点自动前进；hover/暂停时归零
     useEffect(() => {
         if (reducedMotion) return;
-        if (!canAutoplay) {
-            setProgress(0);
-            return;
-        }
+        if (!canAutoplay) return;
         let elapsed = 0;
         const step = 100;
         progressTimerRef.current = setInterval(() => {
             elapsed += step;
-            setProgress(elapsed / AUTOPLAY_MS);
             if (elapsed >= AUTOPLAY_MS) {
                 onIndexChange(active + 1);
                 elapsed = 0;
-                setProgress(0);
             }
         }, step);
         return () => {
             if (progressTimerRef.current) clearInterval(progressTimerRef.current);
         };
-    }, [canAutoplay, active, reducedMotion]);
+    }, [canAutoplay, active, reducedMotion, onIndexChange]);
 
     // 后台标签页：切后台暂停，回来续播
     useEffect(() => {
@@ -158,9 +153,7 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
     }, []);
 
     // 任何用户操作 → 重置自动计时（从 0 重新倒计时）
-    const resetAutoplay = useCallback(() => {
-        setProgress(0);
-    }, []);
+    const resetAutoplay = useCallback(() => {}, []);
 
     const goTo = useCallback(
         (target: number) => {
@@ -224,7 +217,7 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
             role="region"
             aria-label={t("home.heroCarousel.region")}
         >
-            <div className="relative mx-auto flex h-[340px] w-full items-center justify-center sm:h-[420px] md:h-[560px]">
+            <div className="relative mx-auto flex h-[300px] w-full items-center justify-center sm:h-[380px] md:h-[445px]">
                 {items.map((item, idx) => {
                     const slot = slots[idx];
                     if (!slot.visible) return null;
@@ -234,8 +227,8 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                         <motion.div
                             key={item.id}
                             className={cn(
-                                "hero-card absolute flex h-[260px] w-[210px] flex-col overflow-hidden rounded-3xl bg-stone-100 text-left sm:h-[340px] sm:w-[280px] md:h-[460px] md:w-[380px]",
-                                isCenter ? "cursor-default shadow-2xl" : "cursor-pointer",
+                                "hero-card absolute flex h-[260px] w-[210px] flex-col rounded-[20px] bg-black text-left sm:h-[340px] sm:w-[280px] md:h-[445px] md:w-[356px]",
+                                isCenter ? "center-glow cursor-default shadow-2xl" : "cursor-pointer",
                             )}
                             style={{ zIndex: tf.zIndex }}
                             initial={false}
@@ -254,47 +247,41 @@ export const HeroCarousel = forwardRef<HTMLDivElement, HeroCarouselProps>(functi
                                 }
                             }}
                         >
-                            <CardMedia item={item} />
-                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 text-white">
-                                <h3 className="truncate text-base font-medium sm:text-lg">{item.title}</h3>
-                                {item.tags.length > 0 && <p className="mt-1 truncate text-xs text-white/70 sm:text-sm">{item.tags.slice(0, 2).join(" · ")}</p>}
+                            {/* 蓝光晕层垫在卡片后面（z-0，卡片内容 z-10 自带 overflow-hidden 保持圆角裁切），光晕本身向卡片外渗出 */}
+                            {isCenter && <span className="hero-card-glow z-0" />}
+                            {/* 对齐参考 hero__card：卡片只放媒体（img/video 铺满），标题/prompt 展示在底部 overlay */}
+                            <div className="relative z-10 h-full w-full overflow-hidden rounded-[20px]">
+                                <CardMedia item={item} videoSrc={cardVideos?.[idx % cardVideos.length]} />
                             </div>
-                            {isCenter && <span className="pointer-events-none absolute inset-0 rounded-3xl hero-card-glow" />}
                         </motion.div>
                     );
                 })}
             </div>
-
-            {/* 底部控制：左右切换按钮（放在提示词输入框下方，由父级布局） */}
-            {!isMobile && total >= 3 && <CarouselArrows onPrev={prev} onNext={next} prevLabel={t("home.heroCarousel.prev")} nextLabel={t("home.heroCarousel.next")} />}
         </div>
     );
 });
 
-/** 左右切换按钮（胶囊样式，水平成对放在提示词输入框下方，对齐参考：浅灰容器 + 圆角胶囊按钮） */
-export function CarouselArrows({ onPrev, onNext, prevLabel, nextLabel }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string }) {
-    const baseBtn =
-        "flex h-9 w-12 items-center justify-center rounded-lg border border-stone-300/40 bg-white/85 text-stone-700 transition hover:bg-white dark:border-stone-700/40 dark:bg-stone-800/85 dark:text-stone-200 dark:hover:bg-stone-800";
+/** 卡片媒体层：优先视频（按卡轮换），视频加载失败/缺视频回退到图片 */
+function CardMedia({ item, videoSrc }: { item: Prompt; videoSrc?: string }) {
+    const [videoFailed, setVideoFailed] = useState(false);
+    const [imgFailed, setImgFailed] = useState(false);
+    const hasVideo = !!videoSrc && !videoFailed;
+    const hasImage = !!item.coverUrl && !imgFailed;
     return (
-        <div className="mt-10 flex items-center justify-center gap-2 rounded-2xl border border-stone-300/40 bg-stone-100/90 p-1.5 backdrop-blur dark:border-stone-700/40 dark:bg-stone-900/90">
-            <button type="button" onClick={onPrev} aria-label={prevLabel} className={baseBtn}>
-                <ChevronLeft className="size-5" />
-            </button>
-            <button type="button" onClick={onNext} aria-label={nextLabel} className={baseBtn}>
-                <ChevronRight className="size-5" />
-            </button>
-        </div>
-    );
-}
-
-/** 卡片媒体层：图 + 失败/缺图占位 */
-function CardMedia({ item }: { item: Prompt }) {
-    const [failed, setFailed] = useState(false);
-    const hasImage = !!item.coverUrl && !failed;
-    return (
-        <div className="absolute inset-0">
-            {hasImage ? (
-                <img src={item.coverUrl} alt={item.title} onError={() => setFailed(true)} className="h-full w-full object-cover" />
+        <div className="absolute inset-0 overflow-hidden rounded-[20px]">
+            {hasVideo ? (
+                <video
+                    src={videoSrc}
+                    poster={item.coverUrl}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    onError={() => setVideoFailed(true)}
+                    className="h-full w-full object-cover"
+                />
+            ) : hasImage ? (
+                <img src={item.coverUrl} alt={item.title} onError={() => setImgFailed(true)} className="h-full w-full object-cover" />
             ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-stone-200 to-stone-400 dark:from-stone-800 dark:to-stone-950">
                     <span className="text-4xl font-bold text-white/40 dark:text-white/25">{item.title.slice(0, 1) || "•"}</span>
@@ -306,3 +293,22 @@ function CardMedia({ item }: { item: Prompt }) {
 
 export type { HeroCarouselProps };
 export type { Slot };
+
+/** 胶囊切换按钮组件（对齐参考 carousel-nav：#212226 底 + 42x36 双 chevron 按钮，hover 白底黑字） */
+export function HeroCarouselNav({ onPrev, onNext, prevLabel, nextLabel, visible }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string; visible: boolean }) {
+    if (!visible) return null;
+    return (
+        <div className="hero-carousel-nav relative z-50">
+            <button type="button" onClick={onPrev} aria-label={prevLabel} className="hero-carousel-nav__btn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+            </button>
+            <button type="button" onClick={onNext} aria-label={nextLabel} className="hero-carousel-nav__btn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+            </button>
+        </div>
+    );
+}

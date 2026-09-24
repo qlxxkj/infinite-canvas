@@ -343,14 +343,22 @@ export default {
         shortcuts: "快捷键",
         lightTheme: "切换到浅色主题",
         darkTheme: "切换到深色主题",
+        getStarted: "开始使用",
     },
     home: {
         heroCarousel: {
             region: "能力轮播",
             prev: "上一个",
             next: "下一个",
-            dots: "圆点",
             tryIt: "开始使用",
+        },
+        footerDescription: "从一张画布开始，生成、连接、重组，把单次创作变成可推演的视觉工作流。",
+        footerNav: {
+            title: "产品",
+            items: { gen: "生图工作台", video: "视频创作台", prompts: "提示词库", assets: "我的资产" },
+            resources: "资源",
+            docs: "文档与示例",
+            github: "GitHub",
         },
         promptError: "获取提示词失败",
         description: "在 <canvas>无限画布</canvas> 中生成、连接和重组 <content>图片、文字与图形</content>，让创作从单次生成变成连续推演。",
@@ -359,6 +367,30 @@ export default {
         showcaseTitle: "沉淀每一次好结果",
         showcaseDescription: "收藏稳定出图的提示词、参考风格和结果图片，让下一次创作从已有经验开始。",
         viewPrompts: "查看提示词库",
+        slider: {
+            title: "体验最新能力",
+            cards: {
+                image: { name: "生图", desc: "文字描述即刻出图" },
+                video: { name: "视频", desc: "从镜头到成片" },
+                prompt: { name: "提示词", desc: "沉淀与复用好结果" },
+                asset: { name: "资产", desc: "统一存放素材" },
+                canvas: { name: "画布", desc: "连接与重组创作" },
+            },
+        },
+        remix: {
+            title: "从模板开始二创",
+            filters: { all: "全部", featured: "精选", image: "生图", video: "视频", canvas: "画布" },
+            openCta: "查看提示词库",
+        },
+        promptBuilder: {
+            title: "把你的想法变成画面",
+            placeholder: "一句话描述你想创作的内容",
+            getStarted: "开始创作",
+        },
+        caseGrid: {
+            title: "精选提示词",
+            openCase: "查看该提示词",
+        },
     },
     version: {
         viewUpdates: "查看版本更新",

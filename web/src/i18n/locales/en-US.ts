@@ -343,14 +343,22 @@ export default {
         shortcuts: "Keyboard shortcuts",
         lightTheme: "Switch to light theme",
         darkTheme: "Switch to dark theme",
+        getStarted: "Get started",
     },
     home: {
         heroCarousel: {
             region: "Capability carousel",
             prev: "Previous",
             next: "Next",
-            dots: "Dots",
             tryIt: "Get started",
+        },
+        footerDescription: "Start from a single canvas. Generate, connect, and reorganize — turn one-shot creation into a visual workflow you can keep reasoning with.",
+        footerNav: {
+            title: "Product",
+            items: { gen: "Image Studio", video: "Video Studio", prompts: "Prompt Library", assets: "My Assets" },
+            resources: "Resources",
+            docs: "Docs & examples",
+            github: "GitHub",
         },
         promptError: "Failed to load prompts",
         description: "Generate, connect, and reshape <content>images, text, and graphics</content> in <canvas>Infinite Canvas</canvas>, turning one-off generations into a continuous creative process.",
@@ -359,6 +367,30 @@ export default {
         showcaseTitle: "Keep every great result",
         showcaseDescription: "Save reliable prompts, visual references, and generated images so your next creation starts from proven ideas.",
         viewPrompts: "View prompt library",
+        slider: {
+            title: "Explore the latest capabilities",
+            cards: {
+                image: { name: "Image", desc: "Describe it, see it in seconds" },
+                video: { name: "Video", desc: "From shot to finished clip" },
+                prompt: { name: "Prompts", desc: "Save and reuse what works" },
+                asset: { name: "Assets", desc: "One place for your media" },
+                canvas: { name: "Canvas", desc: "Connect and reorganize" },
+            },
+        },
+        remix: {
+            title: "Start remixing from templates",
+            filters: { all: "All", featured: "Featured", image: "Image", video: "Video", canvas: "Canvas" },
+            openCta: "Browse prompt library",
+        },
+        promptBuilder: {
+            title: "Turn your idea into an image",
+            placeholder: "Describe what you want to create in a sentence or two",
+            getStarted: "Get started",
+        },
+        caseGrid: {
+            title: "Featured prompts",
+            openCase: "Open this prompt",
+        },
     },
     version: {
         viewUpdates: "View release updates",
