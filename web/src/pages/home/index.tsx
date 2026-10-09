@@ -17,10 +17,23 @@ const CARD_GRADIENTS: Record<string, string> = {
     canvas: "#4b2d7f",
 };
 
-/** 本地封面图：/media/home/home-NN.jpg（打包到 web/public/media/home/，不依赖外部 CDN） */
-const HOME_COVERS: string[] = Array.from({ length: 12 }, (_, i) => `/media/home/home-${String(i).padStart(2, "0")}.jpg`);
+/** Pexels CDN 封面图（公共 CDN，支持热链接）：按条目 id 顺序分配 12 张 */
+const HOME_COVERS = [
+    "https://images.pexels.com/photos/1574953/pexels-photo-1574953.jpeg",
+    "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg",
+    "https://images.pexels.com/photos/3225432/pexels-photo-3225432.jpeg",
+    "https://images.pexels.com/photos/3674449/pexels-photo-3674449.jpeg",
+    "https://images.pexels.com/photos/3735344/pexels-photo-3735344.jpeg",
+    "https://images.pexels.com/photos/3598431/pexels-photo-3598431.jpeg",
+    "https://images.pexels.com/photos/3752232/pexels-photo-3752232.jpeg",
+    "https://images.pexels.com/photos/4526278/pexels-photo-4526278.jpeg",
+    "https://images.pexels.com/photos/4526284/pexels-photo-4526284.jpeg",
+    "https://images.pexels.com/photos/4525546/pexels-photo-4525546.jpeg",
+    "https://images.pexels.com/photos/4525718/pexels-photo-4525718.jpeg",
+    "https://images.pexels.com/photos/310792/pexels-photo-310792.jpeg",
+] as const;
 
-/** 本地封面轮转：条目 id → 对应本地 jpg */
+/** 按条目序号取对应 Pexels 封面 */
 function coverForHomePrompt(_id: string, index: number): string {
     return HOME_COVERS[index % HOME_COVERS.length] ?? "";
 }
