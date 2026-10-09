@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Free AI Video Generator — Create AI Videos at No Cost | Infinite Canvas</title>
+        <meta
+            name="description"
+            content="Generate AI videos for free with Infinite Canvas — no credits, no paywall. Image-to-video and text-to-video on a self-hosted infinite canvas."
+        />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href="https://hmstu.eu.org/free-ai-video" />
+        <link rel="alternate" hreflang="en-US" href="https://hmstu.eu.org/free-ai-video" />
+        <link rel="alternate" hreflang="zh-CN" href="https://hmstu.eu.org/free-ai-video-zh" />
+
+        <!-- Open Graph / social -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Infinite Canvas" />
+        <meta property="og:title" content="Free AI Video Generator — Infinite Canvas" />
+        <meta
+            property="og:description"
+            content="Generate AI videos for free — image-to-video and text-to-video on a self-hosted infinite canvas. No credits, no paywall."
+        />
+        <meta property="og:url" content="https://hmstu.eu.org/free-ai-video" />
+        <meta property="og:image" content="https://hmstu.eu.org/logo.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <link rel="icon" href="/logo.svg" />
+
+        <!-- Structured data -->
+        <script type="application/ld+json">
+            [
+                {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Infinite Canvas", "item": "https://hmstu.eu.org/" },
+                        { "@type": "ListItem", "position": 2, "name": "Free AI Video Generator", "item": "https://hmstu.eu.org/free-ai-video" }
+                    ]
+                },
+                {
+                    "@context": "https://schema.org",
+                    "@type": "SoftwareApplication",
+                    "name": "Infinite Canvas",
+                    "applicationCategory": "MultimediaApplication",
+                    "operatingSystem": "Web",
+                    "url": "https://hmstu.eu.org/free-ai-video",
+                    "description": "Generate AI videos for free with image-to-video and text-to-video on a self-hosted infinite canvas.",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+                }
+            ]
+        </script>
+
+        <script>
+            // Follow the app's manual theme choice (set by the SPA) so landing
+            // pages match the rest of the site. Falls back to system preference.
+            try {
+                var s = JSON.parse(localStorage.getItem("infinite-canvas:theme_store") || "{}");
+                var t = s.state && s.state.theme === "light" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", t);
+                document.documentElement.style.colorScheme = t;
+            } catch (e) {}
+        </script>
+        <style>
+            :root,
+            [data-theme="light"] {
+                --ink: #0e0f12;
+                --muted: #5b6472;
+                --bg: #ffffff;
+                --card: #f6f7f9;
+                --line: #e6e8ec;
+                --accent: #0e0f12;
+            }
+            [data-theme="dark"],
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --ink: #f5f6f8;
+                    --muted: #a7afb9;
+                    --bg: #0e0f12;
+                    --card: #16181d;
+                    --line: #26292f;
+                    --accent: #f5f6f8;
+                }
+            }
+            * { box-sizing: border-box; }
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: var(--ink);
+                font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+                line-height: 1.6;
+            }
+            main { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+            .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); }
+            .eyebrow .dot { width: 10px; height: 10px; border-radius: 9999px; background: #10b981; }
+            h1 { font-size: 40px; line-height: 1.1; font-weight: 650; margin: 20px 0 0; letter-spacing: -0.02em; }
+            .intro { font-size: 18px; color: var(--muted); margin: 20px 0 0; }
+            .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+            a.btn {
+                display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+                padding: 12px 20px; border-radius: 9999px; font-size: 15px; font-weight: 500; text-decoration: none;
+                border: 1px solid var(--line); color: var(--ink); background: transparent;
+            }
+            a.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+            a.btn:hover { opacity: 0.85; }
+            section { margin-top: 48px; }
+            h2 { font-size: 24px; font-weight: 600; margin: 0 0 12px; letter-spacing: -0.01em; }
+            p { margin: 0; color: var(--muted); }
+            .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+            footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+            footer a { color: var(--muted); }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="eyebrow"><span class="dot"></span>Infinite Canvas — free &amp; self-hosted</div>
+            <h1>Free AI Video Generator</h1>
+            <p class="intro">
+                Turn images and words into motion without a subscription. Infinite Canvas is a free, self-hosted AI
+                workspace: your media stays on your own server, and you generate as much as you need.
+            </p>
+
+            <div class="cta-row">
+                <a class="btn primary" href="/video">Start Free</a>
+                <a class="btn" href="/image-to-video">Image to Video →</a>
+            </div>
+
+            <section>
+                <h2>What is a free AI video generator?</h2>
+                <p>
+                    A free AI video generator turns your input — a photo, a short text prompt, or both — into a moving
+                    video clip. Infinite Canvas does this on an infinite canvas: every generated clip is a node you can
+                    connect, remix, and reason over, instead of one-off exports you can't trace back.
+                </p>
+            </section>
+
+            <section>
+                <h2>Image to video, for free</h2>
+                <p>
+                    Upload a still image and describe the motion you want. The canvas animates it into a short video
+                    clip you can save, restyle, or feed into the next node.
+                </p>
+            </section>
+
+            <section>
+                <h2>Text to video, for free</h2>
+                <p>
+                    Describe a scene in plain language and generate a clip. Compare several takes side by side on the
+                    canvas, then keep the one that matches your idea.
+                </p>
+            </section>
+
+            <section>
+                <h2>Why self-hosted matters</h2>
+                <p>
+                    Self-hosting means no per-clip metering, no third-party limits, and your media never leaves your
+                    infrastructure. Free in the way that lasts — not a capped trial.
+                </p>
+            </section>
+
+            <div class="card">
+                <h2>Keep exploring</h2>
+                <p>
+                    <a href="/image-to-video">Image to Video</a> &middot;
+                    <a href="/docs/overview/quick-start">Quick Start docs</a>
+                </p>
+            </div>
+
+            <footer>
+                Infinite Canvas — a free, self-hosted AI canvas for image, video, text, and graphics.
+            </footer>
+        </main>
+    </body>
+</html>

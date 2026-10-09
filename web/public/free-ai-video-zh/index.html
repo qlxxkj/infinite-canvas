@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>免费 AI 视频生成器 — 零成本创作 AI 视频 | 无限画布</title>
+        <meta
+            name="description"
+            content="用无限画布免费生成 AI 视频，无点数、无付费墙。自托管无限画布上的图生视频与文生视频。"
+        />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href="https://hmstu.eu.org/free-ai-video-zh" />
+        <link rel="alternate" hreflang="en-US" href="https://hmstu.eu.org/free-ai-video" />
+        <link rel="alternate" hreflang="zh-CN" href="https://hmstu.eu.org/free-ai-video-zh" />
+
+        <!-- Open Graph / social -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="无限画布" />
+        <meta property="og:title" content="免费 AI 视频生成器 — 无限画布" />
+        <meta property="og:description" content="免费生成 AI 视频——自托管无限画布上的图生视频与文生视频，无点数、无付费墙。" />
+        <meta property="og:url" content="https://hmstu.eu.org/free-ai-video-zh" />
+        <meta property="og:image" content="https://hmstu.eu.org/logo.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <link rel="icon" href="/logo.svg" />
+
+        <!-- Structured data -->
+        <script type="application/ld+json">
+            [
+                {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "无限画布", "item": "https://hmstu.eu.org/" },
+                        { "@type": "ListItem", "position": 2, "name": "免费 AI 视频生成器", "item": "https://hmstu.eu.org/free-ai-video-zh" }
+                    ]
+                },
+                {
+                    "@context": "https://schema.org",
+                    "@type": "SoftwareApplication",
+                    "name": "无限画布",
+                    "applicationCategory": "MultimediaApplication",
+                    "operatingSystem": "Web",
+                    "url": "https://hmstu.eu.org/free-ai-video-zh",
+                    "description": "用无限画布免费生成 AI 视频，图生视频与文生视频，自托管的无限画布。",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+                }
+            ]
+        </script>
+
+        <script>
+            // 跟随 SPA 手动选择的主题（无限画布站点写入），落地页与主站保持一致；未设置时回退到系统偏好。
+            try {
+                var s = JSON.parse(localStorage.getItem("infinite-canvas:theme_store") || "{}");
+                var t = s.state && s.state.theme === "light" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", t);
+                document.documentElement.style.colorScheme = t;
+            } catch (e) {}
+        </script>
+        <style>
+            :root,
+            [data-theme="light"] {
+                --ink: #0e0f12;
+                --muted: #5b6472;
+                --bg: #ffffff;
+                --card: #f6f7f9;
+                --line: #e6e8ec;
+                --accent: #0e0f12;
+            }
+            [data-theme="dark"],
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --ink: #f5f6f8;
+                    --muted: #a7afb9;
+                    --bg: #0e0f12;
+                    --card: #16181d;
+                    --line: #26292f;
+                    --accent: #f5f6f8;
+                }
+            }
+            * { box-sizing: border-box; }
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: var(--ink);
+                font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+                line-height: 1.7;
+            }
+            main { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+            .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); }
+            .eyebrow .dot { width: 10px; height: 10px; border-radius: 9999px; background: #10b981; }
+            h1 { font-size: 38px; line-height: 1.15; font-weight: 650; margin: 20px 0 0; letter-spacing: -0.01em; }
+            .intro { font-size: 18px; color: var(--muted); margin: 20px 0 0; }
+            .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+            a.btn {
+                display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+                padding: 12px 20px; border-radius: 9999px; font-size: 15px; font-weight: 500; text-decoration: none;
+                border: 1px solid var(--line); color: var(--ink); background: transparent;
+            }
+            a.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+            a.btn:hover { opacity: 0.85; }
+            section { margin-top: 44px; }
+            h2 { font-size: 23px; font-weight: 600; margin: 0 0 12px; }
+            p { margin: 0; color: var(--muted); }
+            .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+            footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+            footer a { color: var(--muted); }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="eyebrow"><span class="dot"></span>无限画布 — 免费 &amp; 可自托管</div>
+            <h1>免费 AI 视频生成器</h1>
+            <p class="intro">
+                不用订阅，把图片和文字变成动态视频。无限画布是一款免费、可自托管的 AI 工作台：你的素材留在自己的服务器上，想生成多少就生成多少。
+            </p>
+
+            <div class="cta-row">
+                <a class="btn primary" href="/video">立即免费开始</a>
+                <a class="btn" href="/image-to-video-zh">图生视频 →</a>
+            </div>
+
+            <section>
+                <h2>什么是免费 AI 视频生成器？</h2>
+                <p>
+                    免费 AI 视频生成器把你的输入——一张图片、一段文字提示，或两者结合——变成动态视频片段。无限画布在无限画布上完成这件事：每个生成的片段都是一个节点，可以被连接、重组、推演，而不是一次性、无法回溯的导出。
+                </p>
+            </section>
+
+            <section>
+                <h2>免费的图生视频</h2>
+                <p>
+                    上传一张静态图，描述你想要的运动。画布会把它动画化成一段短视频，可保存、换风格，或喂给下一个节点。
+                </p>
+            </section>
+
+            <section>
+                <h2>免费的文生视频</h2>
+                <p>
+                    用大白话描述一个画面，直接生成视频片段。在画布上并排对比多个版本，保留最符合你想法的那一个。
+                </p>
+            </section>
+
+            <section>
+                <h2>为什么自托管很重要</h2>
+                <p>
+                    自托管意味着没有按片计费、没有第三方额度限制，素材也永远不离开你的基础设施。免费是真正可持续的那种，而不是限时试用。
+                </p>
+            </section>
+
+            <div class="card">
+                <h2>进一步了解</h2>
+                <p>
+                    <a href="/image-to-video-zh">图生视频</a> &middot;
+                    <a href="/docs/overview/quick-start">快速开始文档</a>
+                </p>
+            </div>
+
+            <footer>
+                无限画布 — 一款免费、可自托管的 AI 画布，支持图像、视频、文字与图形创作。
+            </footer>
+        </main>
+    </body>
+</html>

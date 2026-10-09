@@ -2,6 +2,10 @@ export default {
     meta: {
         title: "无限画布",
         description: "一个无限画布创作工具",
+        seo: {
+            brandDescription: "无限画布是一款免费、可自托管的 AI 创作工具，在同一个可推演的工作台上生成、连接、重组图片、视频、文字与图形。",
+            ogImage: "/logo.svg",
+        },
     },
     theme: { toggle: "切换主题" },
     common: {
@@ -357,8 +361,8 @@ export default {
             title: "产品",
             items: { gen: "生图工作台", video: "视频创作台", prompts: "提示词库", assets: "我的资产" },
             resources: "资源",
-            docs: "文档与示例",
-            github: "GitHub",
+            freeAiVideoZh: "免费 AI 视频",
+            imageToVideoZh: "图生视频",
         },
         promptError: "获取提示词失败",
         description: "在 <canvas>无限画布</canvas> 中生成、连接和重组 <content>图片、文字与图形</content>，让创作从单次生成变成连续推演。",

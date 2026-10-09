@@ -2,6 +2,12 @@ export default {
     meta: {
         title: "Infinite Canvas",
         description: "An infinite canvas creation tool",
+        seo: {
+            // Brand description used for <meta name="description"> and OG tags.
+            brandDescription: "Infinite Canvas is a free, self-hosted AI canvas that generates, connects, and reshapes images, video, text, and graphics on one continuous, reasoning workspace.",
+            // Per-locale canonical base (no trailing path). Overridden at runtime by window.__RUNTIME_CONFIG__.SITE_URL.
+            ogImage: "/logo.svg",
+        },
     },
     theme: { toggle: "Toggle theme" },
     common: {
@@ -357,8 +363,8 @@ export default {
             title: "Product",
             items: { gen: "Image Studio", video: "Video Studio", prompts: "Prompt Library", assets: "My Assets" },
             resources: "Resources",
-            docs: "Docs & examples",
-            github: "GitHub",
+            freeAiVideoZh: "Free AI Video (中文)",
+            imageToVideoZh: "Image to Video (中文)",
         },
         promptError: "Failed to load prompts",
         description: "Generate, connect, and reshape <content>images, text, and graphics</content> in <canvas>Infinite Canvas</canvas>, turning one-off generations into a continuous creative process.",

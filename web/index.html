@@ -1,11 +1,63 @@
 <!doctype html>
-<html lang="zh-CN" class="font-sans">
+<html lang="en" class="font-sans">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="一个无限画布创作工具" />
+
+        <!--
+            Static SEO baseline for crawlers that do not execute JS.
+            At runtime, app-providers.tsx rewrites these (title, description,
+            OG, canonical, hreflang, JSON-LD) to match the resolved locale.
+            Primary target is English: the dominant search traffic comes from
+            non-Chinese regions, so the non-JS snapshot ships EN.
+        -->
+        <title>Infinite Canvas — Free AI Video &amp; Image Generation on One Canvas</title>
+        <meta
+            name="description"
+            content="Infinite Canvas is a free, self-hosted AI canvas to generate, connect, and reshape images, video, text, and graphics — image-to-video, text-to-video, and free AI video generation in one reasoning workspace."
+        />
+        <meta name="keywords" content="free ai video, ai video free, ai video generator, image to video, text to video, free ai video generator, ai video generator, infinite canvas" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href="https://hmstu.eu.org/" />
+        <link rel="alternate" hreflang="en-US" href="https://hmstu.eu.org/?lang=en-US" />
+        <link rel="alternate" hreflang="zh-CN" href="https://hmstu.eu.org/?lang=zh-CN" />
+
+        <!-- Open Graph / social -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Infinite Canvas" />
+        <meta property="og:title" content="Infinite Canvas — Free AI Video &amp; Image Generation" />
+        <meta
+            property="og:description"
+            content="A free, self-hosted AI canvas for image-to-video, text-to-video, and free AI video generation."
+        />
+        <meta property="og:url" content="https://hmstu.eu.org/" />
+        <meta property="og:image" content="https://hmstu.eu.org/logo.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+
         <link rel="icon" href="/logo.svg" />
-        <title>无限画布</title>
+
+        <!-- Structured data for crawlers that don't execute JS -->
+        <script type="application/ld+json">
+            [
+                {
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "Infinite Canvas",
+                    "url": "https://hmstu.eu.org/",
+                    "description": "A free, self-hosted AI canvas for generating and reshaping images, video, text, and graphics."
+                },
+                {
+                    "@context": "https://schema.org",
+                    "@type": "SoftwareApplication",
+                    "name": "Infinite Canvas",
+                    "operatingSystem": "Web",
+                    "applicationCategory": "MultimediaApplication",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+                    "description": "Generate, connect, and reshape images, video, text, and graphics on one infinite canvas. Image-to-video, text-to-video, and free AI video generation."
+                }
+            ]
+        </script>
+
         <script>
             try {
                 var s = JSON.parse(localStorage.getItem("infinite-canvas:theme_store") || "{}");

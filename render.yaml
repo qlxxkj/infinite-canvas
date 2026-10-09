@@ -8,3 +8,8 @@ services:
     envVars:
       - key: PORT
         value: 3000
+      # Public origin used for canonical / Open Graph / structured data in the
+      # SPA. Set to your real domain (no trailing slash) to get correct links.
+      - key: SITE_URL
+        value: https://hmstu.eu.org
+        sync: false

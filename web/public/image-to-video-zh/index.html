@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI 图生视频 — 让照片动起来 | 无限画布</title>
+        <meta
+            name="description"
+            content="把静态图片变成流畅的 AI 视频片段。上传照片、描述运动，几秒生成——免费且可自托管。"
+        />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href="https://hmstu.eu.org/image-to-video-zh" />
+        <link rel="alternate" hreflang="en-US" href="https://hmstu.eu.org/image-to-video" />
+        <link rel="alternate" hreflang="zh-CN" href="https://hmstu.eu.org/image-to-video-zh" />
+
+        <!-- Open Graph / social -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="无限画布" />
+        <meta property="og:title" content="AI 图生视频 — 无限画布" />
+        <meta property="og:description" content="把静态图片变成流畅的 AI 视频片段——免费且可自托管。" />
+        <meta property="og:url" content="https://hmstu.eu.org/image-to-video-zh" />
+        <meta property="og:image" content="https://hmstu.eu.org/logo.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <link rel="icon" href="/logo.svg" />
+
+        <!-- Structured data -->
+        <script type="application/ld+json">
+            [
+                {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "无限画布", "item": "https://hmstu.eu.org/" },
+                        { "@type": "ListItem", "position": 2, "name": "AI 图生视频", "item": "https://hmstu.eu.org/image-to-video-zh" }
+                    ]
+                },
+                {
+                    "@context": "https://schema.org",
+                    "@type": "SoftwareApplication",
+                    "name": "无限画布",
+                    "applicationCategory": "MultimediaApplication",
+                    "operatingSystem": "Web",
+                    "url": "https://hmstu.eu.org/image-to-video-zh",
+                    "description": "把静态图片变成流畅的 AI 视频片段，免费且可自托管的无限画布。",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+                }
+            ]
+        </script>
+
+        <script>
+            // 跟随 SPA 手动选择的主题（无限画布站点写入），落地页与主站保持一致；未设置时回退到系统偏好。
+            try {
+                var s = JSON.parse(localStorage.getItem("infinite-canvas:theme_store") || "{}");
+                var t = s.state && s.state.theme === "light" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", t);
+                document.documentElement.style.colorScheme = t;
+            } catch (e) {}
+        </script>
+        <style>
+            :root,
+            [data-theme="light"] {
+                --ink: #0e0f12;
+                --muted: #5b6472;
+                --bg: #ffffff;
+                --card: #f6f7f9;
+                --line: #e6e8ec;
+                --accent: #0e0f12;
+            }
+            [data-theme="dark"],
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --ink: #f5f6f8;
+                    --muted: #a7afb9;
+                    --bg: #0e0f12;
+                    --card: #16181d;
+                    --line: #26292f;
+                    --accent: #f5f6f8;
+                }
+            }
+            * { box-sizing: border-box; }
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: var(--ink);
+                font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+                line-height: 1.7;
+            }
+            main { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+            .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); }
+            .eyebrow .dot { width: 10px; height: 10px; border-radius: 9999px; background: #10b981; }
+            h1 { font-size: 38px; line-height: 1.15; font-weight: 650; margin: 20px 0 0; letter-spacing: -0.01em; }
+            .intro { font-size: 18px; color: var(--muted); margin: 20px 0 0; }
+            .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+            a.btn {
+                display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+                padding: 12px 20px; border-radius: 9999px; font-size: 15px; font-weight: 500; text-decoration: none;
+                border: 1px solid var(--line); color: var(--ink); background: transparent;
+            }
+            a.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+            a.btn:hover { opacity: 0.85; }
+            section { margin-top: 44px; }
+            h2 { font-size: 23px; font-weight: 600; margin: 0 0 12px; }
+            p { margin: 0; color: var(--muted); }
+            .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+            footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+            footer a { color: var(--muted); }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="eyebrow"><span class="dot"></span>无限画布 — 免费 &amp; 可自托管</div>
+            <h1>用 AI 让任意图片动起来</h1>
+            <p class="intro">
+                给一张照片、一张商品图或一张海报注入生命。描述运动方式，画布会把它动画成一段可直接分享的片段，归属你所有。
+            </p>
+
+            <div class="cta-row">
+                <a class="btn primary" href="/image">试用图生视频</a>
+                <a class="btn" href="/free-ai-video-zh">免费 AI 视频 →</a>
+            </div>
+
+            <section>
+                <h2>图生视频是怎么工作的</h2>
+                <p>
+                    把图片拖到画布上，加一段运动提示（运镜、主体动作、光线），然后生成。结果是一个视频节点，可编辑、换风格，或接到下一镜。
+                </p>
+            </section>
+
+            <section>
+                <h2>使用场景</h2>
+                <p>
+                    让商品图在广告里动起来、把头像和人物肖像动画化、把插画和海报变成循环动态，或一镜一镜地把一个场景分镜出来。
+                </p>
+            </section>
+
+            <section>
+                <h2>无水印、不限量</h2>
+                <p>
+                    因为可自托管，片段完全归你——没有强制水印、没有导出上限、也没有按秒计费。想生成多少版本就生成多少，留下最好的。
+                </p>
+            </section>
+
+            <div class="card">
+                <h2>进一步了解</h2>
+                <p>
+                    <a href="/free-ai-video-zh">免费 AI 视频</a> &middot;
+                    <a href="/docs/overview/quick-start">快速开始文档</a>
+                </p>
+            </div>
+
+            <footer>
+                无限画布 — 一款免费、可自托管的 AI 画布，支持图像、视频、文字与图形创作。
+            </footer>
+        </main>
+    </body>
+</html>

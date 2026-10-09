@@ -11,12 +11,19 @@ sanitize_id() {
     printf '%s' "$1" | tr -cd 'A-Za-z0-9-'
 }
 
+# Allow only characters safe inside a JSON string to avoid breaking config.js.
+sanitize_url() {
+    printf '%s' "$1" | tr -cd 'A-Za-z0-9:/._-#'
+}
+
 GA4_ID=$(sanitize_id "${ANALYTICS_GA4_ID:-}")
 BAIDU_ID=$(sanitize_id "${ANALYTICS_BAIDU_ID:-}")
+SITE_URL=$(sanitize_url "${SITE_URL:-}")
 
 cat > /usr/share/nginx/html/config.js <<EOF
 window.__RUNTIME_CONFIG__ = {
   ANALYTICS_GA4_ID: "${GA4_ID}",
-  ANALYTICS_BAIDU_ID: "${BAIDU_ID}"
+  ANALYTICS_BAIDU_ID: "${BAIDU_ID}",
+  SITE_URL: "${SITE_URL}"
 };
 EOF

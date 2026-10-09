@@ -297,11 +297,11 @@ export default function IndexPage() {
                         </div>
                         <div className="flex flex-col gap-3">
                             <h4 className="text-[17.5px] font-medium text-white">{t("home.footerNav.resources")}</h4>
-                            <a href="https://qlxxkj.github.io/infinite-canvas/" target="_blank" rel="noopener noreferrer" className="text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
-                                {t("home.footerNav.docs")}
+                            <a href="/free-ai-video-zh" className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
+                                {t("home.footerNav.freeAiVideoZh")}
                             </a>
-                            <a href="https://github.com/qlxxkj/infinite-canvas" target="_blank" rel="noopener noreferrer" className="text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
-                                {t("home.footerNav.github")}
+                            <a href="/image-to-video-zh" className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
+                                {t("home.footerNav.imageToVideoZh")}
                             </a>
                         </div>
                     </div>
