@@ -38,7 +38,11 @@ function coverForHomePrompt(_id: string, index: number): string {
     return HOME_COVERS[index % HOME_COVERS.length] ?? "";
 }
 
-/** gstatic 视频池（7 条，按顺序给 hero / slider 卡用，poster 兜底用本地封面） */
+/** gstatic 视频池：
+ *  - aistudio-static 区（7 条）→ hero carousel + slider 各能力卡
+ *  - starter-apps 区（3 条）→ remix 二创区 + 补充 slider
+ *  poster 统一用 Pexels CDN 图片（gstatic 图片已 404）
+ */
 const G = "https://www.gstatic.com/aistudio-static";
 const VIDEO_POOL = [
     `${G}/welcome/video-Gemini.mp4`,
@@ -49,7 +53,14 @@ const VIDEO_POOL = [
     `${G}/editorial/uploads-july20/omni-video.mp4`,
     `${G}/welcome/video-Lyria.mp4`,
 ] as const;
-/** slider 区视频 + 本地 poster（gstatic 图片已 404，统一用本地封面做 poster） */
+const STARTER_VIDEOS = [
+    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/Neon_Snake.mp4",
+    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/window_seat_2.mp4",
+    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/sky_metropolis.mp4",
+] as const;
+/** hero carousel 用：aistudio-static 7 条 + starter-apps 3 条 = 10 条（覆盖 12 张卡，后 2 张循环） */
+const HERO_VIDEOS: string[] = [...VIDEO_POOL, ...STARTER_VIDEOS];
+/** slider 区各能力卡（7 条，poster 用 Pexels 对应序号图片） */
 const SLIDER_VIDEOS: [string, string][] = [
     [VIDEO_POOL[0], HOME_COVERS[0]],
     [VIDEO_POOL[1], HOME_COVERS[1]],
@@ -59,12 +70,12 @@ const SLIDER_VIDEOS: [string, string][] = [
     [VIDEO_POOL[5], HOME_COVERS[5]],
     [VIDEO_POOL[6], HOME_COVERS[6]],
 ];
-/** remix 区视频 + 本地 poster */
-const REMIX_VIDEOS = [
-    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/Neon_Snake.mp4",
-    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/window_seat_2.mp4",
-    "https://www.gstatic.com/aistudio/starter-apps/thumbnails/sky_metropolis.mp4",
-] as const;
+/** remix 区视频 + Pexels poster（按索引对应） */
+const REMIX_VIDEOS: [string, string][] = [
+    [STARTER_VIDEOS[0], HOME_COVERS[3]],
+    [STARTER_VIDEOS[1], HOME_COVERS[5]],
+    [STARTER_VIDEOS[2], HOME_COVERS[7]],
+];
 
 /** 首页本地精选提示词：标题/提示词/标签全部走 i18n（home.homePrompts.items.<id>），
     不再依赖远程 fetchPrompts；封面用本地 /media/home/*.jpg */
@@ -206,7 +217,7 @@ export default function IndexPage() {
                     {/* 3D 环形 Cover Flow 轮播：数据 = 提示词卡，切换时 prompt 打字机联动 */}
                     {promptShowcase.length > 0 && (
                         <div className="mt-6 w-full overflow-x-clip px-2">
-                            <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} cardVideos={[...VIDEO_POOL, ...VIDEO_POOL.slice(0, 2)]} />
+                            <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} cardVideos={HERO_VIDEOS} />
                             {/* Prompt 悬浮框：对齐参考 hero__prompt-overlay（bottom:-40px，框体骑在卡片下缘上）
                                固定高度不随内容撑开：prompt 区 2 行省略，超出截断；行高 30px 保证中文 2 行完整显示不被裁切 */}
                             <div
@@ -419,7 +430,8 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
             <div className="mx-auto h-px w-full bg-white/10" />
             <div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
                 {shown.map((item, index) => {
-                    const poster = HOME_COVERS[index % HOME_COVERS.length] ?? item.coverUrl;
+                    const remixVideo: [string, string] | undefined = index < REMIX_VIDEOS.length ? REMIX_VIDEOS[index] : undefined;
+                    const poster = remixVideo?.[1] ?? HOME_COVERS[index % HOME_COVERS.length] ?? item.coverUrl;
                     return (
                         <button
                             key={item.id}
@@ -428,9 +440,9 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
                             onClick={() => onOpen(item)}
                         >
                             <div className="home-remix-thumb">
-                                {index < REMIX_VIDEOS.length ? (
+                                {remixVideo ? (
                                     <video
-                                        src={REMIX_VIDEOS[index]}
+                                        src={remixVideo[0]}
                                         poster={poster}
                                         muted
                                         loop
