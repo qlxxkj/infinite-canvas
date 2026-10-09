@@ -596,12 +596,14 @@ function SliderSection({ onPrev, onNext, prevLabel, nextLabel, onCardClick, trac
                 末尾补一张 2/3 卡宽的纯占位槽（不可点、透明）把 scrollWidth 加宽，使末卡滚到末尾时完整显示、占位槽留右边被裁 */}
             <div ref={trackRef} className="home-slider-track hide-scrollbar flex gap-4 overflow-x-auto scroll-smooth">
                 {SLIDER_CARDS.map((card, i) => {
-                    const videoSrc = i < SLIDER_VIDEOS.length ? SLIDER_VIDEOS[i][1] : undefined;
+                    const sliderEntry = i < SLIDER_VIDEOS.length ? SLIDER_VIDEOS[i] : undefined;
+                    const videoSrc = sliderEntry?.[0];
+                    const poster = sliderEntry?.[1];
                     return (
                         <button key={`${card.key}-${i}`} type="button" onClick={() => onCardClick(card.to)} className="home-slider-card group shrink-0 cursor-pointer">
                             <div className="home-slider-media relative" style={{ background: `linear-gradient(135deg, #1c1e23, ${CARD_GRADIENTS[card.key]})` }}>
                                 {videoSrc && (
-                                    <video src={videoSrc} muted loop playsInline autoPlay onError={(e) => ((e.target as HTMLVideoElement).style.display = "none")} className="absolute inset-0 h-full w-full object-cover" />
+                                    <video src={videoSrc} poster={poster} muted loop playsInline autoPlay onError={(e) => ((e.target as HTMLVideoElement).style.display = "none")} className="absolute inset-0 h-full w-full object-cover" />
                                 )}
                                 <div className="home-slider-overlay">
                                     <span className="mr-3 text-[32px] leading-none text-white/90">{card.icon}</span>
