@@ -111,13 +111,16 @@ function useTypewriter(text: string, speedMs = 28) {
 
 export default function IndexPage() {
     const { message } = App.useApp();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [promptShowcase, setPromptShowcase] = useState<Prompt[]>([]);
     const [previewIndex, setPreviewIndex] = useState(0);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [heroIndex, setHeroIndex] = useState(0);
     const sliderTrackRef = useRef<HTMLDivElement | null>(null);
+
+    /** EN 模式展示英文提示词示例；中文模式展示中文示例 */
+    const isEn = i18n.resolvedLanguage === "en-US";
 
     const activeCard = promptShowcase.length ? promptShowcase[heroIndex % promptShowcase.length] : undefined;
     const { shown: typedPrompt, caret } = useTypewriter(activeCard?.prompt ?? "");
@@ -154,11 +157,11 @@ export default function IndexPage() {
                         <div className="mt-6 w-full overflow-x-clip px-2">
                             <HeroCarousel items={promptShowcase} activeIndex={heroIndex} onIndexChange={setHeroIndex} cardVideos={[...VIDEO_POOL, ...VIDEO_POOL.slice(0, 2)]} />
                             {/* Prompt 悬浮框：对齐参考 hero__prompt-overlay（bottom:-40px，框体骑在卡片下缘上）
-                               固定高度不随内容撑开：prompt 区单行省略，超出截断 */}
+                               固定高度不随内容撑开：prompt 区 2 行省略，超出截断；行高 30px 保证中文 2 行完整显示不被裁切 */}
                             <div
-                                className="relative z-40 mx-auto -mt-28 flex h-[175px] w-[539px] max-w-full flex-col justify-between gap-4 overflow-hidden rounded-[20px] bg-[#1F1F1F] px-8 pb-6 pt-8 text-left backdrop-blur-[33px]"
+                                className="relative z-40 mx-auto -mt-28 flex h-[200px] w-[539px] max-w-full flex-col justify-between gap-4 overflow-hidden rounded-[20px] bg-[#1F1F1F] px-8 pb-6 pt-8 text-left backdrop-blur-[33px]"
                             >
-                                <p className="line-clamp-2 text-[22px] font-normal leading-[24.64px] tracking-[-0.132px] text-white">
+                                <p className="line-clamp-2 min-h-0 text-[22px] font-normal leading-[30px] tracking-[-0.132px] text-white">
                                     {typedPrompt}
                                     <span className={`ml-0.5 font-light text-[#2E96FF]${caret ? " hero-typewriter-cursor hero-caret-on" : ""}`}>|</span>
                                 </p>
@@ -266,8 +269,9 @@ export default function IndexPage() {
                 />
             </section>
 
-            {/* 页脚：对齐参考 footer —— 品牌描述 + CTA，全页宽 1580px 内边距 40px */}
-            <footer className="footer-zone mx-auto max-w-[1580px] px-10 pb-10">
+            {/* 页脚：对齐参考 footer —— 品牌描述 + CTA，全页宽 1580px 内边距 40px。
+                pt-28 拉开与上方「精选提示词」区块的间距，避免文案贴在一起 */}
+            <footer className="footer-zone mx-auto max-w-[1580px] px-10 pb-10 pt-28">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
                     <div className="flex flex-col items-start">
                         <p className="max-w-[400px] text-[24px] font-normal leading-[1.08] tracking-[-0.144px] text-white lg:max-w-[329px]">{t("home.footerDescription")}</p>
@@ -297,11 +301,17 @@ export default function IndexPage() {
                         </div>
                         <div className="flex flex-col gap-3">
                             <h4 className="text-[17.5px] font-medium text-white">{t("home.footerNav.resources")}</h4>
-                            <a href="/free-ai-video-zh" className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
-                                {t("home.footerNav.freeAiVideoZh")}
+                            <a
+                                href={isEn ? "/free-ai-video" : "/free-ai-video-zh"}
+                                className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white"
+                            >
+                                {t("home.footerNav.freeAiVideo")}
                             </a>
-                            <a href="/image-to-video-zh" className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
-                                {t("home.footerNav.imageToVideoZh")}
+                            <a
+                                href={isEn ? "/image-to-video" : "/image-to-video-zh"}
+                                className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white"
+                            >
+                                {t("home.footerNav.imageToVideo")}
                             </a>
                         </div>
                     </div>
@@ -419,8 +429,12 @@ function HeroParticleBackground() {
 
 /** Prompt Builder：一句话输入 → 跳生图（参考 prompt-builder） */
 function PromptBuilder({ onGo }: { onGo: (text: string) => void }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [text, setText] = useState("");
+    const isEn = i18n.resolvedLanguage === "en-US";
+    const promptSuggestions = isEn
+        ? ["A cozy cabin in snow", "A neon cyberpunk city", "An isometric game world"]
+        : ["雪中的小屋", "霓虹赛博朋克城市", "等距游戏世界"];
     return (
         <section className="relative mx-auto max-w-[1580px] px-2 pt-20 lg:px-6">
             <div className="home-prompt-builder">
@@ -448,7 +462,7 @@ function PromptBuilder({ onGo }: { onGo: (text: string) => void }) {
                         </button>
                     </div>
                     <div className="mt-8 flex flex-wrap justify-center gap-8">
-                        {["A cozy cabin in snow", "A neon cyberpunk city", "An isometric game world"].map((s) => (
+                        {promptSuggestions.map((s) => (
                             <button key={s} type="button" onClick={() => setText(s)} className="home-prompt-suggestion">
                                 <span>✦</span> {s}
                             </button>

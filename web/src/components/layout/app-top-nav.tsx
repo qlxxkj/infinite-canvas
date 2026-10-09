@@ -37,7 +37,7 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="app-top-nav sticky top-0 z-20 h-[81px] shrink-0">
+                <header className="app-top-nav sticky top-0 z-[60] h-[81px] shrink-0">
                     <div className="mx-auto flex h-full max-w-[1580px] items-stretch justify-between gap-5 px-6">
                         <div className="flex min-w-0 items-center">
                             <Link to="/" className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-white transition hover:opacity-80">
