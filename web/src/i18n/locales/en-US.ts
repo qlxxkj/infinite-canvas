@@ -397,6 +397,59 @@ export default {
             title: "Featured prompts",
             openCase: "Open this prompt",
         },
+        homePrompts: {
+            tags: { image: "Image", video: "Video", canvas: "Canvas" },
+            items: {
+                cozyCabin: {
+                    title: "Cozy snow cabin",
+                    prompt: "A snow-dusted A-frame cabin nestled beneath pine trees, warm lanterns glowing in the windows, soft morning light breaking through the storm clouds, 4k cinematic still, 35mm lens",
+                },
+                neonCity: {
+                    title: "Neon cyberpunk city",
+                    prompt: "A rain-slicked megacity at midnight, towering holographic ads and neon kanji signs layered over wet asphalt, a lone figure in a long coat walking the crowded crosswalk, Blade Runner atmosphere, cinematic wide shot",
+                },
+                isoWorld: {
+                    title: "Isometric game world",
+                    prompt: "A miniature isometric village with stone-paved alleys, a bakery, a fountain square, and floating lanterns, soft afternoon light, high detail, hand-painted game art style, 1:1 diorama scale",
+                },
+                macroFlower: {
+                    title: "Macro flower",
+                    prompt: "Extreme macro shot of a blooming lotus petal with morning dew beads, soft bokeh background, iridescent light refraction through the petals, photorealistic, 100mm lens",
+                },
+                productHero: {
+                    title: "Product hero shot",
+                    prompt: "A minimalist perfume bottle centered on a marble plinth with dramatic studio lighting, deep navy backdrop, floating dust particles, luxury commercial photography, 8k detail",
+                },
+                animePortrait: {
+                    title: "Anime portrait",
+                    prompt: "A serene young woman with silver hair and a light coat, standing at the edge of a rooftop overlooking a city at dusk, soft pastel cel-shaded style, Makoto Shinkai-inspired lighting",
+                },
+                foodPlatter: {
+                    title: "Artisan food platter",
+                    prompt: "Overhead shot of a rustic wooden board with freshly baked sourdough, herbs, and olive oil, natural window light, shallow depth of field, editorial food photography, 35mm film grain",
+                },
+                scifiInterior: {
+                    title: "Sci-fi spaceship interior",
+                    prompt: "A sleek spaceship bridge with holo-holographic star charts floating above the central console, brushed metal surfaces, soft cyan rim lighting, cinematic composition, concept art",
+                },
+                natureDoc: {
+                    title: "Nature documentary",
+                    prompt: "A red panda on a mossy branch in a misty Himalayan forest, golden hour back light, 8k wildlife photography, National Geographic style, shallow depth of field",
+                },
+                isometricRoom: {
+                    title: "Isometric cozy room",
+                    prompt: "A warm isometric bedroom with a cozy rug, stacked books, a glowing desk lamp, and string lights, afternoon sunlight through the window, Pixar-style cuteness, 3D diorama render",
+                },
+                videoDrone: {
+                    title: "Drone flight shot",
+                    prompt: "Aerial drone footage of a winding coastline at sunset, turquoise waves breaking on basalt cliffs, long shadows, smooth forward tracking shot, cinematic 4k",
+                },
+                videoNeon: {
+                    title: "Neon rain chase",
+                    prompt: "A black car speeding through a neon-lit city at night, rain-slicked streets reflecting cyan and magenta lights, motion blur, fast pacing, high energy, cinematic 24fps",
+                },
+            },
+        },
     },
     version: {
         viewUpdates: "View release updates",

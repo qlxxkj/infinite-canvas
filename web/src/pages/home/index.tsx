@@ -1,11 +1,10 @@
 import { ArrowRight, LogIn } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { App, Image, Tag } from "antd";
+import { Image, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 
-import { fetchPrompts, type Prompt } from "@/services/api/prompts";
-import i18n from "@/i18n";
+import type { Prompt } from "@/services/api/prompts";
 import { cn } from "@/lib/utils";
 import { HeroCarousel, HeroCarouselNav } from "./hero-carousel";
 
@@ -48,6 +47,35 @@ const CASE_IMAGES = [
     "https://www.gstatic.com/aistudio-static/editorial/uploads-july20/holy-water-thumbnail.jpg",
     "https://www.gstatic.com/aistudio-static/editorial/uploads-july20/CompScience_thumbnail.jpg",
 ] as const;
+
+/** 首页本地精选提示词：标题/提示词/标签全部走 i18n（home.homePrompts.items.<id>），
+    不再依赖远程 fetchPrompts；封面按条目 id 落到现有 gstatic 图片池 */
+type HomePromptId = "cozyCabin" | "neonCity" | "isoWorld" | "macroFlower" | "productHero" | "animePortrait" | "foodPlatter" | "scifiInterior" | "natureDoc" | "isometricRoom" | "videoDrone" | "videoNeon";
+
+const HOME_PROMPT_IDS: HomePromptId[] = [
+    "cozyCabin", "neonCity", "isoWorld", "macroFlower", "productHero", "animePortrait",
+    "foodPlatter", "scifiInterior", "natureDoc", "isometricRoom", "videoDrone", "videoNeon",
+];
+
+const HOME_TAG_BY_ID: Record<HomePromptId, ("image" | "video" | "canvas")[]> = {
+    cozyCabin: ["image"],
+    neonCity: ["image", "video"],
+    isoWorld: ["image", "canvas"],
+    macroFlower: ["image"],
+    productHero: ["image"],
+    animePortrait: ["image"],
+    foodPlatter: ["image"],
+    scifiInterior: ["image", "canvas"],
+    natureDoc: ["image", "video"],
+    isometricRoom: ["image", "canvas"],
+    videoDrone: ["video"],
+    videoNeon: ["video", "canvas"],
+};
+
+/** 按条目 id 轮转复用 gstatic 图片池做封面，避免空图 */
+function coverForHomePrompt(id: HomePromptId, index: number): string {
+    return CASE_IMAGES[index % CASE_IMAGES.length] ?? "";
+}
 
 /** 视频媒体卡：优先播 mp4，加载失败回退到封面图 */
 function VideoCardMedia({ src, poster, label }: { src: string; poster?: string; label: string }) {
@@ -110,10 +138,8 @@ function useTypewriter(text: string, speedMs = 28) {
 }
 
 export default function IndexPage() {
-    const { message } = App.useApp();
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const [promptShowcase, setPromptShowcase] = useState<Prompt[]>([]);
     const [previewIndex, setPreviewIndex] = useState(0);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [heroIndex, setHeroIndex] = useState(0);
@@ -122,18 +148,30 @@ export default function IndexPage() {
     /** EN 模式展示英文提示词示例；中文模式展示中文示例 */
     const isEn = i18n.resolvedLanguage === "en-US";
 
+    /** 首页本地精选提示词（非远程抓取）：标题/提示词/标签/封面全部来自项目内数据 + i18n，
+        随语言切换自动翻译；coverUrl 复用现有 gstatic 图片池 */
+    const promptShowcase: Prompt[] = HOME_PROMPT_IDS.map((id, index) => ({
+        id,
+        title: t(`home.homePrompts.items.${id}.title`),
+        prompt: t(`home.homePrompts.items.${id}.prompt`),
+        description: "",
+        coverUrl: coverForHomePrompt(id, index),
+        referenceImageUrls: [],
+        tags: HOME_TAG_BY_ID[id].map((tag) => t(`home.homePrompts.tags.${tag}`)),
+        preview: "",
+        createdAt: "",
+        updatedAt: "",
+        sourceId: "home",
+        category: "home",
+        githubUrl: "",
+    }));
+
     const activeCard = promptShowcase.length ? promptShowcase[heroIndex % promptShowcase.length] : undefined;
     const { shown: typedPrompt, caret } = useTypewriter(activeCard?.prompt ?? "");
 
     const totalPrompts = promptShowcase.length;
     const goToHeroPrev = () => setHeroIndex((i) => ((i - 1) % totalPrompts + totalPrompts) % totalPrompts);
     const goToHeroNext = () => setHeroIndex((i) => (i + 1) % totalPrompts);
-
-    useEffect(() => {
-        void fetchPrompts({ pageSize: 12 })
-            .then((data) => setPromptShowcase(data.items))
-            .catch((error) => message.error(error instanceof Error ? error.message : i18n.t("home.promptError")));
-    }, [message]);
 
     return (
         <main className="home-page relative h-full overflow-y-auto bg-[#121317] text-white">
