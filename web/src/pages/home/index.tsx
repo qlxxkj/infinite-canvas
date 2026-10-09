@@ -17,7 +17,15 @@ const CARD_GRADIENTS: Record<string, string> = {
     canvas: "#4b2d7f",
 };
 
-/** 参考 HTML 里的 gstatic 媒体资源：按用途映射到首页各区块（视频 + 图片兜底） */
+/** 本地封面图：/media/home/home-NN.jpg（打包到 web/public/media/home/，不依赖外部 CDN） */
+const HOME_COVERS: string[] = Array.from({ length: 12 }, (_, i) => `/media/home/home-${String(i).padStart(2, "0")}.jpg`);
+
+/** 本地封面轮转：条目 id → 对应本地 jpg */
+function coverForHomePrompt(_id: string, index: number): string {
+    return HOME_COVERS[index % HOME_COVERS.length] ?? "";
+}
+
+/** gstatic 视频池（7 条，按顺序给 hero / slider 卡用，poster 兜底用本地封面） */
 const G = "https://www.gstatic.com/aistudio-static";
 const VIDEO_POOL = [
     `${G}/welcome/video-Gemini.mp4`,
@@ -28,28 +36,25 @@ const VIDEO_POOL = [
     `${G}/editorial/uploads-july20/omni-video.mp4`,
     `${G}/welcome/video-Lyria.mp4`,
 ] as const;
+/** slider 区视频 + 本地 poster（gstatic 图片已 404，统一用本地封面做 poster） */
 const SLIDER_VIDEOS: [string, string][] = [
-    [VIDEO_POOL[0], `${G}/welcome/video-Gemini.mp4`],
-    [VIDEO_POOL[1], `${G}/nano_banana/Intuitive_image_generation_and_editing.mp4`],
-    [VIDEO_POOL[2], `${G}/welcome/video-Veo.mp4`],
-    [VIDEO_POOL[3], `${G}/welcome/video-Tts.mp4`],
-    [VIDEO_POOL[4], `${G}/welcome/video-Live.mp4`],
-    [VIDEO_POOL[5], `${G}/editorial/uploads-july20/omni-video.mp4`],
-    [VIDEO_POOL[6], `${G}/welcome/video-Lyria.mp4`],
+    [VIDEO_POOL[0], HOME_COVERS[0]],
+    [VIDEO_POOL[1], HOME_COVERS[1]],
+    [VIDEO_POOL[2], HOME_COVERS[2]],
+    [VIDEO_POOL[3], HOME_COVERS[3]],
+    [VIDEO_POOL[4], HOME_COVERS[4]],
+    [VIDEO_POOL[5], HOME_COVERS[5]],
+    [VIDEO_POOL[6], HOME_COVERS[6]],
 ];
+/** remix 区视频 + 本地 poster */
 const REMIX_VIDEOS = [
     "https://www.gstatic.com/aistudio/starter-apps/thumbnails/Neon_Snake.mp4",
     "https://www.gstatic.com/aistudio/starter-apps/thumbnails/window_seat_2.mp4",
     "https://www.gstatic.com/aistudio/starter-apps/thumbnails/sky_metropolis.mp4",
 ] as const;
-const CASE_IMAGES = [
-    "https://www.gstatic.com/aistudio-static/editorial/uploads-july20/shopify_featured.jpg",
-    "https://www.gstatic.com/aistudio-static/editorial/uploads-july20/holy-water-thumbnail.jpg",
-    "https://www.gstatic.com/aistudio-static/editorial/uploads-july20/CompScience_thumbnail.jpg",
-] as const;
 
 /** 首页本地精选提示词：标题/提示词/标签全部走 i18n（home.homePrompts.items.<id>），
-    不再依赖远程 fetchPrompts；封面按条目 id 落到现有 gstatic 图片池 */
+    不再依赖远程 fetchPrompts；封面用本地 /media/home/*.jpg */
 type HomePromptId = "cozyCabin" | "neonCity" | "isoWorld" | "macroFlower" | "productHero" | "animePortrait" | "foodPlatter" | "scifiInterior" | "natureDoc" | "isometricRoom" | "videoDrone" | "videoNeon";
 
 const HOME_PROMPT_IDS: HomePromptId[] = [
@@ -71,11 +76,6 @@ const HOME_TAG_BY_ID: Record<HomePromptId, ("image" | "video" | "canvas")[]> = {
     videoDrone: ["video"],
     videoNeon: ["video", "canvas"],
 };
-
-/** 按条目 id 轮转复用 gstatic 图片池做封面，避免空图 */
-function coverForHomePrompt(id: HomePromptId, index: number): string {
-    return CASE_IMAGES[index % CASE_IMAGES.length] ?? "";
-}
 
 /** 视频媒体卡：优先播 mp4，加载失败回退到封面图 */
 function VideoCardMedia({ src, poster, label }: { src: string; poster?: string; label: string }) {
@@ -405,41 +405,44 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
             </div>
             <div className="mx-auto h-px w-full bg-white/10" />
             <div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
-                {shown.map((item, index) => (
-                    <button
-                        key={item.id}
-                        type="button"
-                        className="home-remix-card"
-                        onClick={() => onOpen(item)}
-                    >
-                        <div className="home-remix-thumb">
-                            {index < REMIX_VIDEOS.length ? (
-                                <video
-                                    src={REMIX_VIDEOS[index]}
-                                    poster={item.coverUrl}
-                                    muted
-                                    loop
-                                    playsInline
-                                    autoPlay
-                                    onError={(e) => {
-                                        const el = e.target as HTMLVideoElement;
-                                        el.outerHTML = `<img src="${item.coverUrl}" alt="${item.title}" class="absolute inset-0 h-full w-full object-cover" />`;
-                                    }}
-                                    className="absolute inset-0 h-full w-full object-cover"
-                                />
-                            ) : (
-                                <img src={item.coverUrl} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
-                            )}
-                            <div className="home-remix-overlay">
-                                <button type="button" onClick={(e) => { e.stopPropagation(); onRemix(item); }} className="home-remix-btn">
-                                    {t("home.heroCarousel.tryIt")}
-                                </button>
+                {shown.map((item, index) => {
+                    const poster = HOME_COVERS[index % HOME_COVERS.length] ?? item.coverUrl;
+                    return (
+                        <button
+                            key={item.id}
+                            type="button"
+                            className="home-remix-card"
+                            onClick={() => onOpen(item)}
+                        >
+                            <div className="home-remix-thumb">
+                                {index < REMIX_VIDEOS.length ? (
+                                    <video
+                                        src={REMIX_VIDEOS[index]}
+                                        poster={poster}
+                                        muted
+                                        loop
+                                        playsInline
+                                        autoPlay
+                                        onError={(e) => {
+                                            const el = e.target as HTMLVideoElement;
+                                            el.outerHTML = `<img src="${poster}" alt="${item.title}" class="absolute inset-0 h-full w-full object-cover" />`;
+                                        }}
+                                        className="absolute inset-0 h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <img src={poster} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+                                )}
+                                <div className="home-remix-overlay">
+                                    <button type="button" onClick={(e) => { e.stopPropagation(); onRemix(item); }} className="home-remix-btn">
+                                        {t("home.heroCarousel.tryIt")}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <h3 className="text-[17.5px] leading-[25.375px] tracking-[0.1925px] text-white">{item.title}</h3>
-                        <p className="mt-1.5 line-clamp-2 text-[14.5px] leading-[21px] tracking-[0.1595px] text-[#9299a2]">{item.prompt}</p>
-                    </button>
-                ))}
+                            <h3 className="text-[17.5px] leading-[25.375px] tracking-[0.1925px] text-white">{item.title}</h3>
+                            <p className="mt-1.5 line-clamp-2 text-[14.5px] leading-[21px] tracking-[0.1595px] text-[#9299a2]">{item.prompt}</p>
+                        </button>
+                    );
+                })}
             </div>
             <div className="mt-10 text-center">
                 <button
@@ -512,7 +515,7 @@ function PromptBuilder({ onGo }: { onGo: (text: string) => void }) {
     );
 }
 
-/** 案例大图（参考 card-grid）：精选提示词大图卡 */
+/** 案例大图（参考 card-grid）：精选提示词大图卡，封面用本地 HOME_COVERS */
 function CaseGrid({ prompts, onOpen }: { prompts: Prompt[]; onOpen: (item: Prompt) => void }) {
     const { t } = useTranslation();
     if (prompts.length === 0) return null;
@@ -524,7 +527,7 @@ function CaseGrid({ prompts, onOpen }: { prompts: Prompt[]; onOpen: (item: Promp
                     <button key={item.id} type="button" className="home-case-card" onClick={() => onOpen(item)}>
                         <div className="home-case-thumb">
                             <img
-                                src={i < CASE_IMAGES.length ? CASE_IMAGES[i] : item.coverUrl}
+                                src={HOME_COVERS[i % HOME_COVERS.length] ?? item.coverUrl}
                                 alt={item.title}
                                 className="h-full w-full object-cover"
                                 onError={(e) => {
