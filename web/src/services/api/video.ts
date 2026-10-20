@@ -235,8 +235,10 @@ async function createAgnesVideoTask(config: AiConfig, model: string, prompt: str
 
 async function pollAgnesVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
     try {
-        // Agnes 官方推荐轮询端点；task.model 即 model_name（keyframe/reference 模式必填）
-        const url = `${aiApiUrl(config, "/agnesapi")}?video_id=${encodeURIComponent(task.id)}&model_name=${encodeURIComponent(task.model)}`;
+        // Agnes /agnesapi 是根路径端点（不带 /v1），task.model 需去 channel 前缀
+        const base = config.baseUrl.trim().replace(/\/+$/, "").replace(/\/v1$/, "");
+        const model = modelOptionName(task.model);
+        const url = `${withLocalProxy(base)}/agnesapi?video_id=${encodeURIComponent(task.id)}&model_name=${encodeURIComponent(model)}`;
         const response = await axios.get<ApiVideoResponse>(url, { headers: aiHeaders(config), signal: options?.signal, validateStatus: (code) => code === 200 || code === 404 });
         const raw = response.data;
         // 任务尚未被轮询服务识别时返回 404，视为 pending，不中断轮询循环
