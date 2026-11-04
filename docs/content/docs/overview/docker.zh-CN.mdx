@@ -89,3 +89,44 @@ docker run -d -p 3000:3000 \
 <Callout type="warn">
 请只在你自己的站点上配置统计 ID，不要把 ID 提交进仓库；fork 或自托管本项目的用户默认不会产生任何统计。
 </Callout>
+
+## 系统默认 Agnes 渠道（可选，推荐）
+
+部署方可以注入一套 **Agnes 官方渠道**作为系统默认，让所有访问者打开即有可用的图像 / 视频 / 文本生成能力，无需各自填 API Key。镜像启动时由 `docker-entrypoint.sh` 据环境变量生成运行期配置，与统计一样无需改代码或重建镜像。
+
+| 变量 | 说明 | 默认 |
+| --- | --- | --- |
+| `AGNES_API_KEY` | Agnes API Key（`sk-...`） | 空（不启用） |
+| `AGNES_BASE_URL` | Agnes API 根地址 | `https://apihub.agnes-ai.com` |
+| `AGNES_IMAGE_MODEL` | 图像模型 | `agnes-image-2.5-flash` |
+| `AGNES_VIDEO_MODEL` | 视频模型 | `agnes-video-2.5` |
+| `AGNES_TEXT_MODEL` | 文本模型 | `agnes-3.0-flash` |
+| `AGNES_CHANNEL_NAME` | 渠道展示名 | `Agnes 官方` |
+
+> 仅当 `AGNES_API_KEY` 与 `AGNES_BASE_URL` 同时非空时启用。启用后前端会在配置中注入一条 Agnes 渠道；若用户已自配了同 baseUrl 的渠道则不重复注入，且不会覆盖用户已有渠道。
+
+在 `docker-compose.yml` 中配置：
+
+```yaml
+services:
+  app:
+    image: ghcr.io/basketikun/infinite-canvas:latest
+    ports:
+      - "3000:3000"
+    environment:
+      AGNES_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx
+      AGNES_BASE_URL: https://apihub.agnes-ai.com
+```
+
+或使用 `docker run`：
+
+```bash
+docker run -d -p 3000:3000 \
+  -e AGNES_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxx \
+  -e AGNES_BASE_URL=https://apihub.agnes-ai.com \
+  ghcr.io/basketikun/infinite-canvas:latest
+```
+
+<Callout type="warn">
+`AGNES_API_KEY` 是真实密钥，请只放在你自己的部署里，不要提交进仓库或写进公开镜像标签。Key 会写入该站点浏览器的前端运行期配置，对访问该站点的所有用户可见——请确保你的部署方与用户信任关系允许共享该 Key。
+</Callout>

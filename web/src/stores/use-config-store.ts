@@ -5,6 +5,8 @@ import { nanoid } from "nanoid";
 
 import i18n from "@/i18n";
 
+import { AGNES_API_KEY, AGNES_BASE_URL, AGNES_CHANNEL_NAME, AGNES_CHANNEL_ENABLED, AGNES_IMAGE_MODEL, AGNES_TEXT_MODEL, AGNES_VIDEO_MODEL } from "@/constant/runtime-config";
+
 export type ApiCallFormat = "openai" | "gemini";
 export type ModelCapability = "image" | "video" | "text" | "audio";
 export type ReasoningEffort = "auto" | "low" | "medium" | "high" | "xhigh";
@@ -245,20 +247,23 @@ export const useConfigStore = create<ConfigStore>()(
                 const persistedWebdav = (persistedState.webdav || {}) as Partial<WebdavSyncConfig>;
                 const config = { ...defaultConfig, ...persistedConfig };
                 if (!Array.isArray(persistedConfig.channels)) config.channels = [];
-                const channels = normalizeChannels(config);
-                const models = modelOptionsFromChannels(channels);
+                let channels = normalizeChannels(config);
+                let models = modelOptionsFromChannels(channels);
+                // 注入系统 Agnes 渠道（env 配置启用时）：无等价 baseUrl 渠道才注入，不覆盖用户自配
+                const configAfterSystem: AiConfig = { ...config, channels, models };
+                const withSystem = withSystemChannel(configAfterSystem);
+                channels = withSystem.channels;
+                models = withSystem.models;
                 return {
                     ...current,
                     webdav: { ...defaultWebdavSyncConfig, ...persistedWebdav },
                     config: {
-                        ...config,
+                        ...withSystem,
                         channelMode: "local",
                         apiFormat: normalizeApiFormat(config.apiFormat),
-                        channels,
-                        models,
-                        imageModel: normalizeModelOptionValue(config.imageModel || config.model, channels),
-                        videoModel: normalizeModelOptionValue(config.videoModel, channels),
-                        textModel: normalizeModelOptionValue(config.textModel || config.model, channels),
+                        imageModel: normalizeModelOptionValue(withSystem.imageModel || withSystem.model, channels),
+                        videoModel: normalizeModelOptionValue(withSystem.videoModel, channels),
+                        textModel: normalizeModelOptionValue(withSystem.textModel || withSystem.model, channels),
                         audioModel: normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
                         audioVoice: config.audioVoice || defaultConfig.audioVoice,
                         audioFormat: config.audioFormat || defaultConfig.audioFormat,
@@ -463,6 +468,50 @@ function normalizeChannels(config: AiConfig) {
 export function defaultBaseUrlForApiFormat(apiFormat: ApiCallFormat) {
     if (apiFormat === "gemini") return GEMINI_BASE_URL;
     return OPENAI_BASE_URL;
+}
+
+// 系统 Agnes 渠道：部署方通过环境变量注入 AGNES_API_KEY + AGNES_BASE_URL，
+// 所有用户首次加载（或已配置但缺 key 的渠道）自动获得可用的默认渠道。
+// 仅在用户没有等价 baseUrl 的渠道时注入，避免覆盖用户自己的配置。
+export const AGNES_CHANNEL_ID = "agnes-system";
+
+export function buildSystemChannel(): ModelChannel | null {
+    if (!AGNES_CHANNEL_ENABLED) return null;
+    return {
+        id: AGNES_CHANNEL_ID,
+        name: AGNES_CHANNEL_NAME,
+        baseUrl: AGNES_BASE_URL,
+        apiKey: AGNES_API_KEY,
+        apiFormat: "openai",
+        models: [
+            { name: AGNES_IMAGE_MODEL, capability: "image" },
+            { name: AGNES_VIDEO_MODEL, capability: "video" },
+            { name: AGNES_TEXT_MODEL, capability: "text" },
+        ],
+    };
+}
+
+/** 把系统 Agnes 渠道注入 config（若无等价 baseUrl 渠道）；返回新的 config。 */
+function withSystemChannel(config: AiConfig): AiConfig {
+    const system = buildSystemChannel();
+    if (!system) return config;
+    // 已存在同 baseUrl 渠道（用户自配 Agnes）则不重复注入
+    const hasEquivalent = config.channels.some((ch) => normalizedBaseUrlKey(ch.baseUrl) === normalizedBaseUrlKey(system.baseUrl));
+    if (hasEquivalent) return config;
+    const channels = [...config.channels, system];
+    // 默认模型指向系统渠道（仅当当前默认渠道没有 key 时）
+    const defaultCh = channels[0];
+    const needsSystem = AGNES_CHANNEL_ENABLED && !defaultCh?.apiKey?.trim();
+    const models = modelOptionsFromChannels(channels);
+    const pickDefault = (cap: ModelCapability) => (needsSystem ? encodeChannelModel(system.id, cap === "image" ? AGNES_IMAGE_MODEL : cap === "video" ? AGNES_VIDEO_MODEL : AGNES_TEXT_MODEL) : "");
+    return {
+        ...config,
+        channels,
+        models,
+        imageModel: pickDefault("image") || config.imageModel,
+        videoModel: pickDefault("video") || config.videoModel,
+        textModel: pickDefault("text") || config.textModel,
+    };
 }
 
 function normalizeApiFormat(apiFormat: unknown): ApiCallFormat {

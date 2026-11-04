@@ -9,3 +9,14 @@ services:
     # environment:
     #   ANALYTICS_GA4_ID: G-XXXXXXXXXX                    # Google Analytics 4 衡量 ID
     #   ANALYTICS_BAIDU_ID: xxxxxxxxxxxxxxxxxxxxxxxxxxxx   # 百度统计站点 ID
+    #
+    # 系统默认 Agnes 渠道（可选，推荐）：设置 AGNES_API_KEY + AGNES_BASE_URL 后，
+    # 所有用户打开即有可用 Agnes 默认渠道（图像/视频/文本），无需各自填 key。
+    # 用户自配了同 baseUrl 的渠道则不覆盖，仅在缺失时注入。
+    # environment:
+    #   AGNES_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx       # Agnes API Key
+    #   AGNES_BASE_URL: https://apihub.agnes-ai.com        # Agnes API 根地址（默认即此值）
+    #   AGNES_IMAGE_MODEL: agnes-image-2.5-flash            # 可选，覆盖图像模型
+    #   AGNES_VIDEO_MODEL: agnes-video-2.5                  # 可选，覆盖视频模型
+    #   AGNES_TEXT_MODEL: agnes-3.0-flash                   # 可选，覆盖文本模型
+    #   AGNES_CHANNEL_NAME: Agnes 官方                      # 可选，渠道展示名

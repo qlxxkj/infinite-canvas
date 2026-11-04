@@ -60,3 +60,31 @@ services:
 ```
 
 SPA route changes automatically report page views to enabled providers. Only configure analytics IDs on sites you control, and do not commit them to the repository.
+
+## Optional system Agnes channel
+
+A deployment can ship a default **Agnes** channel so every visitor gets image / video / text generation out of the box, without each one filling in an API key. The image generates this runtime config from environment variables at startup (same mechanism as analytics).
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `AGNES_API_KEY` | Agnes API key (`sk-...`) | empty (disabled) |
+| `AGNES_BASE_URL` | Agnes API root | `https://apihub.agnes-ai.com` |
+| `AGNES_IMAGE_MODEL` | image model | `agnes-image-2.5-flash` |
+| `AGNES_VIDEO_MODEL` | video model | `agnes-video-2.5` |
+| `AGNES_TEXT_MODEL` | text model | `agnes-3.0-flash` |
+| `AGNES_CHANNEL_NAME` | channel display name | `Agnes` |
+
+> Enabled only when both `AGNES_API_KEY` and `AGNES_BASE_URL` are set. It injects one Agnes channel into the config; if the user already has a channel with the same base URL it is not duplicated and the user's channels are never overwritten.
+
+```yaml
+services:
+  app:
+    image: ghcr.io/basketikun/infinite-canvas:latest
+    ports:
+      - "3000:3000"
+    environment:
+      AGNES_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx
+      AGNES_BASE_URL: https://apihub.agnes-ai.com
+```
+
+The key is written into the site's frontend runtime config and is therefore visible to all visitors of that deployment. Only share it where your trust relationship with users allows; never commit the real key to the repository or a public image tag.
