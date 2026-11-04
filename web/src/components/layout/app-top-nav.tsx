@@ -37,7 +37,8 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="app-top-nav sticky top-0 z-[60] h-14 shrink-0 sm:h-[81px]">
+                // h-14 sm:h-16：导航条高度上限 64px（旧 81px 在 h-dvh 布局里会盖住各页面顶部内容）
+                <header className="app-top-nav sticky top-0 z-[60] h-14 shrink-0 sm:h-16">
                     <div className="mx-auto flex h-full max-w-[1580px] items-stretch justify-between gap-3 px-4 sm:gap-5 sm:px-6">
                         <div className="flex min-w-0 items-center">
                             <Link to="/" className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-white transition hover:opacity-80">
@@ -61,7 +62,7 @@ export function AppTopNav() {
                                 <Menu className="size-5" />
                             </button>
 
-                            <nav className="hide-scrollbar ml-8 hidden h-[81px] min-w-0 items-center gap-7 overflow-x-auto md:flex">
+                            <nav className="hide-scrollbar ml-8 hidden min-w-0 items-center gap-7 overflow-x-auto md:flex">
                                 {navigationTools.map((tool) => {
                                     const Icon = tool.icon;
                                     const active = tool.slug === activeToolSlug;

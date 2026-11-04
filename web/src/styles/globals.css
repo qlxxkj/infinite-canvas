@@ -149,6 +149,19 @@
     color: #fff;
 }
 
+/* home 页顶部留白：让内容从悬浮导航条下方开始（导航 h-14=56px 手机 / sm:h-16=64px 桌面） */
+@media (max-width: 639px) {
+    .home-page .hero-zone {
+        padding-top: 68px;
+    }
+}
+
+@media (min-width: 640px) {
+    .home-page .hero-zone {
+        padding-top: 76px;
+    }
+}
+
 /* 顶部导航：底色 #121317 @ 70% + blur 毛玻璃，白主文字、#cdd4dc 次级链接、hover 变白 */
 .app-top-nav {
     background-color: #121317B3;
@@ -564,28 +577,6 @@
     }
 
     /* ===== 移动端适配（< sm = 640px）：桌面布局按 1580px 设计，手机上只收宽度不动结构 ===== */
-
-    /* 顶部导航：81px 在手机上过高，缩到 56px */
-    @media (max-width: 639px) {
-        .app-top-nav {
-            height: 56px;
-        }
-
-        .app-top-nav nav {
-            height: 56px;
-        }
-    }
-
-    /* Hero 区：导航变矮后 padding 相应收回 */
-    @media (max-width: 639px) {
-        .hero-zone {
-            padding-top: 52px;
-        }
-
-        .hero-zone > div {
-            margin-bottom: 0;
-        }
-    }
 
     /* 横滑条：手机上单卡占 4/5 视口（露下一张一角），覆盖桌面 1/3 卡宽
        （desktop 规则在上、此处同特异性靠后生效）；
