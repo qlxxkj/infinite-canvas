@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 
-import { AgentPanel } from "@/components/agent/agent-panel";
 import { AppTopNav } from "@/components/layout/app-top-nav";
+
+/** AgentPanel 含 streamdown/motion/agent-chat 整条依赖链，lazy 出去不影响首屏 */
+const AgentPanel = lazy(() => import("@/components/agent/agent-panel").then((m) => ({ default: m.AgentPanel })));
 
 export default function UserLayout({ children }: { children: ReactNode }) {
     return (
@@ -17,7 +19,9 @@ export default function UserLayout({ children }: { children: ReactNode }) {
                     <AppTopNav />
                 </div>
             </div>
-            <AgentPanel />
+            <Suspense fallback={null}>
+                <AgentPanel />
+            </Suspense>
         </div>
     );
 }
