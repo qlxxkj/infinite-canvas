@@ -563,6 +563,93 @@
         margin-bottom: 48px;
     }
 
+    /* ===== 移动端适配（< sm = 640px）：桌面布局按 1580px 设计，手机上只收宽度不动结构 ===== */
+
+    /* 顶部导航：81px 在手机上过高，缩到 56px */
+    @media (max-width: 639px) {
+        .app-top-nav {
+            height: 56px;
+        }
+
+        .app-top-nav nav {
+            height: 56px;
+        }
+    }
+
+    /* Hero 区：导航变矮后 padding 相应收回 */
+    @media (max-width: 639px) {
+        .hero-zone {
+            padding-top: 52px;
+        }
+
+        .hero-zone > div {
+            margin-bottom: 0;
+        }
+    }
+
+    /* 横滑条：手机上单卡占 4/5 视口（露下一张一角），覆盖桌面 1/3 卡宽
+       （desktop 规则在上、此处同特异性靠后生效）；
+       轨道可视区（desktop 的 calc(100% + 33.33333%)）保持不变，露出半张 4/5 卡 ≈ 42% → 裁切效果自然 */
+    @media (max-width: 639px) {
+        .home-slider-card {
+            width: 80%;
+        }
+
+        /* 占位槽跟 80% 卡宽等比（≈0.53 卡） */
+        .home-slider-spacer--two-thirds {
+            width: 53.3%;
+        }
+
+        /* 媒体 1:1 在窄卡上太高（~85% 视口高），改 4/3；底部信息胶囊收窄 */
+        .home-slider-media {
+            aspect-ratio: 4 / 3;
+        }
+
+        .home-slider-overlay {
+            bottom: 12px;
+            height: 60px;
+            padding: 0 14px;
+            border-radius: 20px;
+        }
+    }
+
+    /* Remix 筛选 tab：手机上字号/内边距缩小、保持可换行 */
+    @media (max-width: 639px) {
+        .home-remix-filter {
+            padding: 8px 14px 8px 12px;
+            font-size: 14px;
+            line-height: 20px;
+            border-radius: 10px;
+        }
+    }
+
+    /* Prompt Builder：整屏 min-height 与 36px 大圆角在手机上收掉 */
+    @media (max-width: 639px) {
+        .home-prompt-builder {
+            min-height: 0;
+            border-radius: 20px;
+        }
+
+        .home-prompt-input-wrapper {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .home-prompt-builder .home-prompt-suggestion {
+            font-size: 13px;
+        }
+    }
+
+    /* 案例大图：标题字号 + 缩略图底部大留白收回 */
+    @media (max-width: 639px) {
+        .home-case-thumb {
+            margin-bottom: 24px;
+        }
+    }
+
     .hide-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;

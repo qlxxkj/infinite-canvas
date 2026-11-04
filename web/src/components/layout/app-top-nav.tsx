@@ -37,8 +37,8 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="app-top-nav sticky top-0 z-[60] h-[81px] shrink-0">
-                    <div className="mx-auto flex h-full max-w-[1580px] items-stretch justify-between gap-5 px-6">
+                <header className="app-top-nav sticky top-0 z-[60] h-14 shrink-0 sm:h-[81px]">
+                    <div className="mx-auto flex h-full max-w-[1580px] items-stretch justify-between gap-3 px-4 sm:gap-5 sm:px-6">
                         <div className="flex min-w-0 items-center">
                             <Link to="/" className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-white transition hover:opacity-80">
                                 <span
@@ -48,12 +48,12 @@ export function AppTopNav() {
                                         WebkitMask: "url(/logo.svg) center / contain no-repeat",
                                     }}
                                 />
-                                <span className="text-base font-medium text-white">{t("meta.title")}</span>
+                                <span className="hidden text-base font-medium text-white min-[480px]:block">{t("meta.title")}</span>
                             </Link>
 
                             <button
                                 type="button"
-                                className="ml-3 inline-flex size-8 shrink-0 items-center justify-center text-white/70 transition hover:text-white md:hidden"
+                                className="ml-2 inline-flex size-8 shrink-0 items-center justify-center text-white/70 transition hover:text-white md:hidden"
                                 onClick={() => setMobileNavOpen(true)}
                                 aria-label={t("topNav.openMenu")}
                                 title={t("topNav.menu")}
@@ -100,10 +100,10 @@ export function AppTopNav() {
                                 type="button"
                                 onClick={() => navigate("/image")}
                                 style={{ color: "#0e0f12" }}
-                                className="ml-6 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-[14.5px] font-medium leading-[21px] tracking-[0.11px] transition-colors hover:bg-[#e6eaf0]"
+                                className="ml-4 inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-3 py-1.5 text-[13px] font-medium leading-5 transition-colors hover:bg-[#e6eaf0] sm:ml-6 sm:px-4 sm:py-2 sm:text-[14.5px] sm:leading-[21px]"
                             >
                                 <LogIn className="size-4 shrink-0" style={{ color: "#0e0f12" }} />
-                                {t("topNav.getStarted")}
+                                <span className="hidden min-[480px]:inline">{t("topNav.getStarted")}</span>
                             </button>
                         </div>
                     </div>

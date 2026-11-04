@@ -202,11 +202,11 @@ export default function IndexPage() {
             {/* Hero 区：对齐参考 aistudio.google.com/welcome —— 深色底 #121317、白主文字、#b2bbc5 次级文字
                pt-20 让内容从悬浮导航栏下方开始（参考 hero padding-top:120px），滚动时内容进入导航下方毛玻璃 */}
             <section className="hero-zone relative mx-auto min-h-[calc(100vh-4rem)] w-full overflow-hidden px-5 pt-14 lg:px-10">
-                <div className="relative flex min-h-[460px] flex-col items-center justify-center pt-24 text-center sm:min-h-[560px] lg:min-h-[720px] lg:pt-32">
+                <div className="relative flex min-h-[460px] flex-col items-center justify-center pt-20 text-center sm:min-h-[560px] lg:min-h-[720px] lg:pt-32">
                     {/* 粒子视频铺底（只包在轮播区，对齐参考 hero__media：welcome_hero_particles.mp4 + 四周压暗） */}
                     <HeroParticleBackground />
                     <div className="relative z-10">
-                        <h1 className="ai-title-aurora max-w-5xl text-balance text-5xl font-normal tracking-[-1.44px] sm:text-6xl lg:text-[64px]">
+                        <h1 className="ai-title-aurora max-w-5xl text-balance text-4xl font-normal tracking-[-1px] sm:text-5xl lg:text-[64px]">
                             {t("meta.title")}
                         </h1>
                         <p className="mt-4 max-w-3xl text-balance text-base leading-7 text-[#b2bbc5]">
@@ -221,9 +221,9 @@ export default function IndexPage() {
                             {/* Prompt 悬浮框：对齐参考 hero__prompt-overlay（bottom:-40px，框体骑在卡片下缘上）
                                固定高度不随内容撑开：prompt 区 2 行省略，超出截断；行高 30px 保证中文 2 行完整显示不被裁切 */}
                             <div
-                                className="relative z-40 mx-auto -mt-28 flex h-[200px] w-[539px] max-w-full flex-col justify-between gap-4 overflow-hidden rounded-[20px] bg-[#1F1F1F] px-8 pb-6 pt-8 text-left backdrop-blur-[33px]"
+                                className="relative z-40 mx-auto -mt-24 flex h-[172px] w-full max-w-[539px] flex-col justify-between gap-3 overflow-hidden rounded-[16px] bg-[#1F1F1F] px-5 pb-5 pt-6 text-left backdrop-blur-[33px] sm:-mt-28 sm:h-[200px] sm:rounded-[20px] sm:px-8 sm:pb-6 sm:pt-8"
                             >
-                                <p className="line-clamp-2 min-h-0 text-[22px] font-normal leading-[30px] tracking-[-0.132px] text-white">
+                                <p className="line-clamp-2 min-h-0 text-[17px] font-normal leading-[24px] tracking-[-0.1px] text-white sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.132px]">
                                     {typedPrompt}
                                     <span className={`ml-0.5 font-light text-[#2E96FF]${caret ? " hero-typewriter-cursor hero-caret-on" : ""}`}>|</span>
                                 </p>
@@ -252,10 +252,10 @@ export default function IndexPage() {
                     )}
                 </div>
 
-                <section className="relative mx-auto mb-12 max-w-[1580px] px-2 pt-20 lg:px-6">
-                    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <section className="relative mx-auto mb-10 max-w-[1580px] px-4 pt-14 sm:mb-12 sm:pt-20 lg:px-6">
+                    <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="max-w-2xl">
-                            <h2 className="text-[28px] font-normal leading-[1.1] tracking-[-0.28px] text-white lg:text-[42px] lg:tracking-[-0.84px]">{t("home.showcaseTitle")}</h2>
+                            <h2 className="text-[22px] font-normal leading-[1.15] tracking-[-0.2px] text-white sm:text-[28px] sm:tracking-[-0.28px] lg:text-[42px] lg:tracking-[-0.84px]">{t("home.showcaseTitle")}</h2>
                             <p className="mt-3 text-base leading-7 text-[#b2bbc5]">{t("home.showcaseDescription")}</p>
                         </div>
                         <button
@@ -333,10 +333,10 @@ export default function IndexPage() {
 
             {/* 页脚：对齐参考 footer —— 品牌描述 + CTA，全页宽 1580px 内边距 40px。
                 pt-28 拉开与上方「精选提示词」区块的间距，避免文案贴在一起 */}
-            <footer className="footer-zone mx-auto max-w-[1580px] px-10 pb-10 pt-28">
+            <footer className="footer-zone mx-auto max-w-[1580px] px-5 pb-8 pt-14 sm:px-10 sm:pt-28">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
                     <div className="flex flex-col items-start">
-                        <p className="max-w-[400px] text-[24px] font-normal leading-[1.08] tracking-[-0.144px] text-white lg:max-w-[329px]">{t("home.footerDescription")}</p>
+                        <p className="max-w-[400px] text-[20px] font-normal leading-[1.15] tracking-[-0.1px] text-white sm:text-[24px] sm:leading-[1.08] sm:tracking-[-0.144px] lg:max-w-[329px]">{t("home.footerDescription")}</p>
                         <button
                             type="button"
                             onClick={() => navigate("/image")}
@@ -349,29 +349,29 @@ export default function IndexPage() {
                     </div>
                     <div className="flex flex-wrap gap-x-10 gap-y-6 lg:ml-auto">
                         <div className="flex flex-col gap-3">
-                            <h4 className="text-[17.5px] font-medium text-white">{t("home.footerNav.title")}</h4>
+                            <h4 className="text-[15px] font-medium text-white sm:text-[17.5px]">{t("home.footerNav.title")}</h4>
                             {[
                                 { label: t("home.footerNav.items.gen"), to: "/image" },
                                 { label: t("home.footerNav.items.video"), to: "/video" },
                                 { label: t("home.footerNav.items.prompts"), to: "/prompts" },
                                 { label: t("home.footerNav.items.assets"), to: "/assets" },
                             ].map((link) => (
-                                <button key={link.to} type="button" onClick={() => navigate(link.to)} className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white">
+                                <button key={link.to} type="button" onClick={() => navigate(link.to)} className="text-left text-[13.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white sm:text-[14.5px]">
                                     {link.label}
                                 </button>
                             ))}
                         </div>
                         <div className="flex flex-col gap-3">
-                            <h4 className="text-[17.5px] font-medium text-white">{t("home.footerNav.resources")}</h4>
+                            <h4 className="text-[15px] font-medium text-white sm:text-[17.5px]">{t("home.footerNav.resources")}</h4>
                             <a
                                 href={isEn ? "/free-ai-video" : "/free-ai-video-zh"}
-                                className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white"
+                                className="text-left text-[13.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white sm:text-[14.5px]"
                             >
                                 {t("home.footerNav.freeAiVideo")}
                             </a>
                             <a
                                 href={isEn ? "/image-to-video" : "/image-to-video-zh"}
-                                className="text-left text-[14.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white"
+                                className="text-left text-[13.5px] leading-5 text-[#b2bbc5] transition-colors hover:text-white sm:text-[14.5px]"
                             >
                                 {t("home.footerNav.imageToVideo")}
                             </a>
@@ -411,10 +411,10 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
     const shown = filter === "all" ? prompts : filter === "featured" ? prompts.slice(0, 6) : prompts.slice(0, 6);
     if (shown.length === 0) return null;
     return (
-        <section className="relative mx-auto max-w-[1580px] px-2 pt-20 lg:px-6">
-            <div className="mx-auto mb-8 max-w-full text-center">
-                <h2 className="text-[28px] font-normal leading-[1.1] tracking-[-0.5px] text-white lg:text-[42px] lg:tracking-[-0.84px]">{t("home.remix.title")}</h2>
-                <div className="mt-6 flex flex-wrap justify-center gap-0">
+        <section className="relative mx-auto max-w-[1580px] px-4 pt-14 lg:px-6">
+            <div className="mx-auto mb-6 max-w-full text-center sm:mb-8">
+                <h2 className="text-[22px] font-normal leading-[1.15] tracking-[-0.3px] text-white sm:text-[28px] sm:tracking-[-0.5px] lg:text-[42px] lg:tracking-[-0.84px]">{t("home.remix.title")}</h2>
+                <div className="mt-4 flex flex-wrap justify-center gap-0 sm:mt-6">
                     {filters.map((f) => (
                         <button
                             key={f.key}
@@ -428,7 +428,7 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
                 </div>
             </div>
             <div className="mx-auto h-px w-full bg-white/10" />
-            <div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-8 sm:mt-10 sm:grid-cols-2 sm:gap-y-11 lg:grid-cols-3">
                 {shown.map((item, index) => {
                     const remixVideo: [string, string] | undefined = index < REMIX_VIDEOS.length ? REMIX_VIDEOS[index] : undefined;
                     const poster = remixVideo?.[1] ?? HOME_COVERS[index % HOME_COVERS.length] ?? item.coverUrl;
@@ -469,7 +469,7 @@ function RemixSection({ prompts, onOpen, onRemix, onBrowse }: { prompts: Prompt[
                     );
                 })}
             </div>
-            <div className="mt-10 text-center">
+            <div className="mt-7 text-center sm:mt-10">
                 <button
                     type="button"
                     onClick={onBrowse}
@@ -502,32 +502,32 @@ function PromptBuilder({ onGo }: { onGo: (text: string) => void }) {
         ? ["A cozy cabin in snow", "A neon cyberpunk city", "An isometric game world"]
         : ["雪中的小屋", "霓虹赛博朋克城市", "等距游戏世界"];
     return (
-        <section className="relative mx-auto max-w-[1580px] px-2 pt-20 lg:px-6">
+        <section className="relative mx-auto max-w-[1580px] px-4 pt-14 lg:px-6">
             <div className="home-prompt-builder">
                 <ParticleBackground />
-                <div className="relative z-10 flex w-full flex-col items-center px-5 py-14 text-center lg:py-20">
-                    <h2 className="mb-8 text-[32px] font-normal leading-[1.1] tracking-[-0.5px] text-white lg:text-[54px] lg:tracking-[-1.08px]">{t("home.promptBuilder.title")}</h2>
+                <div className="relative z-10 flex w-full flex-col items-center px-4 py-10 text-center sm:px-5 sm:py-14 lg:py-20">
+                    <h2 className="mb-6 text-[24px] font-normal leading-[1.15] tracking-[-0.3px] text-white sm:mb-8 sm:text-[32px] sm:tracking-[-0.5px] lg:text-[54px] lg:tracking-[-1.08px]">{t("home.promptBuilder.title")}</h2>
                     <div className="home-prompt-input-wrapper w-full">
                         <textarea
                             rows={1}
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                             placeholder={t("home.promptBuilder.placeholder")}
-                            className="flex-1 resize-none border-none bg-transparent text-[17.5px] leading-[25.375px] tracking-[0.1925px] text-white outline-none placeholder:text-white/50"
+                            className="w-full flex-1 resize-none border-none bg-transparent text-[15px] leading-6 tracking-[0.1px] text-white outline-none placeholder:text-white/50 sm:text-[17.5px] sm:leading-[25.375px] sm:tracking-[0.1925px]"
                         />
                         <button
                             type="button"
                             onClick={() => onGo(text)}
                             disabled={!text.trim()}
                             className={cn(
-                                "shrink-0 rounded-xl px-4 py-2 text-[14.5px] font-medium transition-colors",
+                                "w-full shrink-0 rounded-xl px-4 py-2.5 text-[15px] font-medium transition-colors sm:w-auto sm:py-2 sm:text-[14.5px]",
                                 text.trim() ? "bg-white text-[#0e0f12] hover:bg-[#e6eaf0]" : "cursor-default bg-[#18191d] text-[#45474d]",
                             )}
                         >
                             {t("home.promptBuilder.getStarted")}
                         </button>
                     </div>
-                    <div className="mt-8 flex flex-wrap justify-center gap-8">
+                    <div className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 sm:mt-8 sm:gap-8 sm:gap-y-0">
                         {promptSuggestions.map((s) => (
                             <button key={s} type="button" onClick={() => setText(s)} className="home-prompt-suggestion">
                                 <span>✦</span> {s}
@@ -545,9 +545,9 @@ function CaseGrid({ prompts, onOpen }: { prompts: Prompt[]; onOpen: (item: Promp
     const { t } = useTranslation();
     if (prompts.length === 0) return null;
     return (
-        <section className="relative mx-auto max-w-[1580px] px-2 pt-20 lg:px-6">
-            <h2 className="mb-9 text-left text-[45px] leading-[1.1] text-white">{t("home.caseGrid.title")}</h2>
-            <div className="grid grid-cols-1 gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="relative mx-auto max-w-[1580px] px-4 pt-14 lg:px-6">
+            <h2 className="mb-5 text-left text-[28px] leading-[1.15] text-white sm:mb-9 sm:text-[45px] sm:leading-[1.1]">{t("home.caseGrid.title")}</h2>
+            <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 sm:gap-y-11 lg:grid-cols-3">
                 {prompts.map((item, i) => (
                     <button key={item.id} type="button" className="home-case-card" onClick={() => onOpen(item)}>
                         <div className="home-case-thumb">
@@ -561,8 +561,8 @@ function CaseGrid({ prompts, onOpen }: { prompts: Prompt[]; onOpen: (item: Promp
                                 }}
                             />
                         </div>
-                        <h3 className="mb-4 text-[28px] leading-[30.2px] text-white">{item.title}</h3>
-                        <span className="flex items-center gap-1 self-start text-[17.5px] font-medium leading-[25.4px] text-white transition-opacity hover:opacity-80">
+                        <h3 className="mb-3 text-[20px] leading-[24px] text-white sm:mb-4 sm:text-[28px] sm:leading-[30.2px]">{item.title}</h3>
+                        <span className="flex items-center gap-1 self-start text-[15px] font-medium leading-5 text-white transition-opacity hover:opacity-80 sm:text-[17.5px] sm:leading-[25.4px]">
                             {t("home.caseGrid.openCase")} <ArrowRight className="size-5" />
                         </span>
                     </button>
@@ -586,9 +586,9 @@ const SLIDER_CARDS = [
 function SliderSection({ onPrev, onNext, prevLabel, nextLabel, onCardClick, trackRef }: { onPrev: () => void; onNext: () => void; prevLabel: string; nextLabel: string; onCardClick: (to: string) => void; trackRef: React.RefObject<HTMLDivElement | null> }) {
     const { t } = useTranslation();
     return (
-        <section className="relative mx-auto mb-0 max-w-[1580px] overflow-hidden px-2 pt-20 lg:px-6">
-            <div className="mb-6 flex items-end justify-between">
-                <h2 className="text-[28px] font-normal leading-[1.1] tracking-[-0.5px] text-white lg:text-[42px] lg:tracking-[-0.84px]">{t("home.slider.title")}</h2>
+        <section className="relative mx-auto mb-0 max-w-[1580px] overflow-hidden px-4 pt-14 lg:px-6">
+            <div className="mb-5 flex items-end justify-between gap-3 sm:mb-6">
+                <h2 className="text-[22px] font-normal leading-[1.15] tracking-[-0.3px] text-white sm:text-[28px] sm:tracking-[-0.5px] lg:text-[42px] lg:tracking-[-0.84px]">{t("home.slider.title")}</h2>
                 <div className="flex-1" />
                 <HeroCarouselNav onPrev={onPrev} onNext={onNext} prevLabel={prevLabel} nextLabel={nextLabel} visible={true} />
             </div>
